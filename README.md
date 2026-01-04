@@ -1,4 +1,4 @@
-# X-WEB3
+# x2011
 
 A modern static web application built with Next.js.
 
@@ -6,10 +6,10 @@ A modern static web application built with Next.js.
 
 | Platform | URL |
 |----------|-----|
-| Cloudflare Pages | [x-web3.pages.dev](https://x-web3.pages.dev) |
-| Cloudflare Workers | [x-web3.xera2011.workers.dev](https://x-web3.xera2011.workers.dev) |
-| Vercel | [x-web3-xera2011.vercel.app](https://x-web3-xera2011.vercel.app) |
-| GitHub Pages | [xera-2011.github.io/x-web3](https://xera-2011.github.io/x-web3) |
+| Cloudflare Pages | [x2011.pages.dev](https://x2011.pages.dev) |
+| Cloudflare Workers | [x2011.xera2011.workers.dev](https://x2011.xera2011.workers.dev) |
+| Vercel | [x2011-xera2011.vercel.app](https://x2011.xera2011.vercel.app) |
+| GitHub Pages | [xera-2011.github.io/x2011](https://xera-2011.github.io/x2011) |
 
 ## 🚀 Getting Started
 

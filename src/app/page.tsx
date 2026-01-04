@@ -1,7 +1,14 @@
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">X-WEB3</h1>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <h1 style={{ fontSize: "2.25rem", fontWeight: "bold" }}>x2011</h1>
     </div>
   );
 }

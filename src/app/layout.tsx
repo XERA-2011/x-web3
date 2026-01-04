@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "X-WEB3",
+  title: "x2011",
   description: "Static website",
 };
 
