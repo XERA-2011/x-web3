@@ -6,6 +6,9 @@ import {
 import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { ATUtil } from '../core/ATUtil';
+import Img0 from '../res/img/light-leak/0.jpg';
+
+const TEXTURES = [Img0];
 
 export class LightLeak implements VizEffect {
     name = "LightLeak";
@@ -33,7 +36,9 @@ export class LightLeak implements VizEffect {
         // Original: for(var t=0;c>t;t++) u[t]=THREE.ImageUtils.loadTexture("res/img/light-leak/"+t+".jpg"),
         //           u[t].minFilter = u[t].magFilter = THREE.LinearFilter
         for (let i = 0; i < this.textureCount; i++) {
-            const texture = loader.load(`/viz/lantern/res/img/light-leak/${i}.jpg`);
+            const img = TEXTURES[i];
+            const src = (img as any).src || img;
+            const texture = loader.load(src);
             texture.minFilter = LinearFilter;
             texture.magFilter = LinearFilter;
             this.textures.push(texture);

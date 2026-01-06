@@ -1,44 +1,125 @@
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-black text-white p-8 font-sans">
-      <header className="mb-12 border-b border-gray-800 pb-4 flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">x2011</h1>
-          <p className="text-gray-400">Experimental WebGL Visualizations</p>
-        </div>
-      </header>
+// Demo Data
+const DEMOS = [
+  {
+    id: 'lantern',
+    title: 'LANTERN',
+    img: '/img/thumbs/uber.jpg',
+    href: '/viz/lantern', // Internal Next.js route
+    external: false
+  },
+  {
+    id: 'nero',
+    title: 'NERO',
+    img: '/img/thumbs/nero.jpg',
+    href: '/viz/nero', // Internal Next.js route
+    external: false
+  },
+  {
+    id: 'splice',
+    title: 'SPLICE',
+    img: '/img/thumbs/splice.jpg',
+    href: '/viz/splice',
+    external: false
+  },
+  {
+    id: 'bbng',
+    title: 'BBNG',
+    img: '/img/thumbs/bbng.jpg',
+    href: '/viz/bbng',
+    external: false
+  },
+  {
+    id: 'word-problems',
+    title: 'WORD PROBLEMS',
+    img: '/img/thumbs/word.jpg',
+    href: '/viz/word-problems',
+    external: false
+  },
+  {
+    id: 'loop',
+    title: 'LOOP WAVEFORM VISUALIZER',
+    img: '/img/thumbs/loop.jpg',
+    href: '/viz/loop', // Internal Next.js route
+    external: false
+  },
+  {
+    id: 'pareidolia',
+    title: 'PAREIDOLIA',
+    img: '/img/thumbs/pareidolia.jpg',
+    href: '/viz/pareidolia',
+    external: false,
+    date: '10.12.13',
+  }
+];
 
-      <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Link href="/viz/lantern" className="group relative block bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-500 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-900/20">
-          <div className="h-48 bg-gradient-to-br from-gray-800 to-black overflow-hidden relative">
-            {/* Thumbnail Placeholder - could reuse lantern logo or screenshot if available */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-100 transition-opacity duration-500">
-              <div className="w-20 h-20 rounded-full bg-orange-500/20 blur-xl group-hover:bg-orange-500/40 transition-all"></div>
-            </div>
-            <img
-              src="/viz/lantern/res/img/intro/logo-400.png"
-              alt="Lantern Logo"
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-auto opacity-80 group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0"
+
+
+export default function Home() {
+
+  return (
+    <div className="min-h-screen bg-black text-[#CCC] font-lato p-5 md:p-10 flex flex-col items-center">
+
+      {/* Content Container */}
+      <div className="w-full max-w-[980px] relative">
+
+        {/* Header */}
+        <header className="mb-10">
+          <h1 className="-ml-[10px]">
+            <Image
+              src="/img/logo-550.png"
+              alt="ÜberViz"
+              width={550}
+              height={100}
+              className="max-w-full h-auto"
+              priority
             />
-          </div>
-          <div className="p-6">
-            <h2 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">Lantern</h2>
-            <p className="text-gray-400 text-sm line-clamp-2">
-              A realtime music visualizer originally by UberViz.
-              Featuring audio-reactive particles, ripples, and post-processing effects.
-              Ported to React/Three.js.
+          </h1>
+          <div className="mt-[30px] space-y-[30px]">
+            <p className="text-[28px] font-light tracking-[1px] leading-[150%] text-[#DDD]">
+              We build custom real-time audio-reactive music visualizers, using web technologies such as WebGL, Web Audio, and custom GLSL shaders. We also build live concert visuals and interactive installations.
             </p>
-            <div className="mt-4 flex gap-2">
-              <span className="text-xs px-2 py-1 bg-gray-800 rounded text-gray-300">Three.js</span>
-              <span className="text-xs px-2 py-1 bg-gray-800 rounded text-gray-300">React</span>
-              <span className="text-xs px-2 py-1 bg-gray-800 rounded text-gray-300">WebGL</span>
-            </div>
+
+            <p className="text-[28px] font-light tracking-[1px] leading-[150%] text-[#DDD]">
+              Say <a href="https://twitter.com/uberviz" className="text-white border-b border-white hover:opacity-80 transition-opacity">hello</a>.
+            </p>
           </div>
-        </Link>
-      </main>
+        </header>
+
+        {/* Demos Section */}
+        <section id="demos" className="w-full mt-10">
+          <h2 className="font-oswald text-2xl tracking-[4px] text-white leading-[42px] mb-5 mt-10">LIVE DEMOS</h2>
+
+          <div className="pt-5 overflow-auto flex flex-wrap -mr-5">
+            {DEMOS.map((demo) => (
+              <div key={demo.id} className="float-left w-full sm:w-[calc(50%-20px)] pb-5 mr-5 mb-5 md:mb-0">
+                <Link href={demo.href} className="group block text-[#AAA] hover:text-white transition-all duration-400">
+                  <div className="overflow-hidden">
+                    <img
+                      src={demo.img}
+                      alt={demo.title}
+                      className="block w-full h-full transition-all duration-600 ease-[cubic-bezier(0.19,1,0.22,1)] grayscale filter hover:grayscale-[1%] hover:scale-[1.03] transform"
+                    />
+                  </div>
+                  <div className="h-[50px] leading-[50px] tracking-[3px] uppercase text-center font-oswald text-[17px]">
+                    {demo.title}
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
+
+      </div>
+
+
     </div>
   );
 }

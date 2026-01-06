@@ -42,6 +42,12 @@ export interface FXConfig {
     };
 }
 
+import DefaultConfig from '../res/config/default.json';
+import FxConfig from '../res/config/fx.json';
+import LanternAudio from '../res/mp3/Lantern.mp3';
+
+// ... interface definitions ...
+
 export class ConfigManager {
     config: AppConfig = {
         useMic: false,
@@ -50,7 +56,7 @@ export class ConfigManager {
         doLoop: false,
         loopStart: 0,
         loopEnd: 0,
-        audioURL: "res/mp3/Lantern.mp3",
+        audioURL: LanternAudio, // Use imported audio
         fxFileName: "fx.json",
         showControls: false,
         showIntro: true,
@@ -66,8 +72,18 @@ export class ConfigManager {
 
     async load(configName: string = "default") {
         try {
-            const response = await fetch(`/viz/lantern/config/${configName}.json`);
-            const data = await response.json();
+            // In a real scenario we might have a map of configs
+            // For now, we only have default
+            let data: any = DefaultConfig;
+            if (configName !== 'default') {
+                console.warn(`Config ${configName} not found, using default`);
+            }
+
+            // Override audio URL in config with imported one if needed
+            if (data.config && data.config.audioURL) {
+                data.config.audioURL = LanternAudio;
+            }
+
             this.config = { ...this.config, ...data.config };
         } catch (e) {
             console.error("Failed to load config", e);
@@ -77,9 +93,7 @@ export class ConfigManager {
 
     async loadFXConfig() {
         try {
-            const response = await fetch(`/viz/lantern/config/${this.config.fxFileName}`);
-            const data = await response.json();
-            this.fxConfig = data;
+            this.fxConfig = FxConfig as unknown as FXConfig;
 
             // Initialize noise positions for auto-randomization
             if (this.fxConfig) {

@@ -1,0 +1,67 @@
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
+import { WordProblemsApp } from '@/viz/word-problems/WordProblemsApp';
+import AudioFile from '@/viz/word-problems/res/mp3/Word_Problems_Edit.mp3';
+
+export default function WordProblemsPage() {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const appRef = useRef<WordProblemsApp | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [started, setStarted] = useState(false);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const app = new WordProblemsApp(containerRef.current);
+        appRef.current = app;
+
+        return () => {
+            app.dispose();
+        };
+    }, []);
+
+    const handleStart = async () => {
+        if (!appRef.current || started) return;
+
+        setLoading(true);
+        setStarted(true);
+
+        const audioUrl = AudioFile;
+        await appRef.current.initAudio(audioUrl);
+        setLoading(false);
+    };
+
+    return (
+        <div className="w-full h-screen bg-black overflow-hidden relative touch-none">
+            <div ref={containerRef} className="absolute inset-0" />
+
+            {!started && (
+                <div
+                    className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 cursor-pointer hover:bg-black/70 transition-colors"
+                    onClick={handleStart}
+                >
+                    <div className="text-white font-oswald text-2xl tracking-widest border border-white px-8 py-4 hover:bg-white hover:text-black transition-colors">
+                        CLICK TO START (WORD PROBLEMS)
+                    </div>
+                </div>
+            )}
+
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+                    <div className="text-white font-mono animate-pulse">
+                        LOADING AUDIO...
+                    </div>
+                </div>
+            )}
+
+            <div className={`absolute top-5 right-5 text-gray-500 font-mono text-xs pointer-events-none transition-opacity duration-500 ${started ? 'opacity-100' : 'opacity-0'}`}>
+                WORD PROBLEMS VISUALIZER
+            </div>
+
+            <div className={`absolute bottom-5 left-5 text-gray-600 font-mono text-xs max-w-md pointer-events-none transition-opacity duration-500 ${started ? 'opacity-100' : 'opacity-0'}`}>
+                Music: Word Problems - Harmonic 313
+            </div>
+        </div>
+    );
+}

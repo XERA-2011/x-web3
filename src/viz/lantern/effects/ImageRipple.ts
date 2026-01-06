@@ -8,6 +8,15 @@ import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { ImageRippleShader } from '../shaders/Shaders';
 import { gsap } from 'gsap';
 
+import Img0 from '../res/img/img-overlay/sbtrkt/0.jpg';
+import Img1 from '../res/img/img-overlay/sbtrkt/1.jpg';
+import Img2 from '../res/img/img-overlay/sbtrkt/2.jpg';
+import Img3 from '../res/img/img-overlay/sbtrkt/3.jpg';
+import Img4 from '../res/img/img-overlay/sbtrkt/4.jpg';
+import Img5 from '../res/img/img-overlay/sbtrkt/5.jpg';
+
+const TEXTURES = [Img0, Img1, Img2, Img3, Img4, Img5];
+
 export class ImageRipple implements VizEffect {
     name = "ImageRipple";
     params = {
@@ -37,7 +46,9 @@ export class ImageRipple implements VizEffect {
 
         const loader = new TextureLoader();
         for (let i = 0; i < this.textureCount; i++) {
-            this.textures.push(loader.load(`/viz/lantern/res/img/img-overlay/sbtrkt/${i}.jpg`));
+            const img = TEXTURES[i];
+            const src = (img as any).src || img;
+            this.textures.push(loader.load(src));
         }
 
         this.material = new ShaderMaterial({

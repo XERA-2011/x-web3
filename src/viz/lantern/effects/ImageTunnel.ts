@@ -8,6 +8,12 @@ import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { ATUtil } from '../core/ATUtil';
 import { BPMManager } from '../core/BPMManager';
 
+import Img0 from '../res/img/tunnel/0.jpg';
+import Img1 from '../res/img/tunnel/1.jpg';
+import Img2 from '../res/img/tunnel/2.jpg';
+
+const TEXTURES = [Img0, Img1, Img2];
+
 export class ImageTunnel implements VizEffect {
     name = "ImageTunnel";
     params = {
@@ -39,7 +45,9 @@ export class ImageTunnel implements VizEffect {
 
         const loader = new TextureLoader();
         for (let i = 0; i < this.textureCount; i++) {
-            this.textures.push(loader.load(`/viz/lantern/res/img/tunnel/${i}.jpg`));
+            const img = TEXTURES[i];
+            const src = (img as any).src || img;
+            this.textures.push(loader.load(src));
         }
 
         this.material = new MeshBasicMaterial({
