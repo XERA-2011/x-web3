@@ -17,6 +17,7 @@ import { LightLeak } from '../effects/LightLeak';
 import { ImageTunnel } from '../effects/ImageTunnel';
 import { ImageRipple } from '../effects/ImageRipple';
 import { Crystal } from '../effects/Crystal';
+import { ControlsHandler } from './ControlsHandler';
 
 export class VizController {
     scene: Scene;
@@ -39,6 +40,7 @@ export class VizController {
     tumblerProgress = 0;
     autoMode = true;
 
+    controls: ControlsHandler;
     private container: HTMLElement | null = null;
 
     constructor() {
@@ -63,16 +65,19 @@ export class VizController {
         this.fx = new FXManager(this.scene, this.camera, this.renderer);
         this.sequence = new SequenceHandler(this);
 
-        // Register Effects
+        // Register Effects (matching original order in VizHandler.init: ColorWheel, Crystal, ImageRipple, ImageTunnel, Eclipse, Ripples, StarBars, Stars, LightLeak)
         this.addEffect(new ColorWheel());
-        this.addEffect(new Ripples());
-        this.addEffect(new Stars());
-        this.addEffect(new StarBars());
-        this.addEffect(new Eclipse());
-        this.addEffect(new LightLeak());
-        this.addEffect(new ImageTunnel());
-        this.addEffect(new ImageRipple());
         this.addEffect(new Crystal());
+        this.addEffect(new ImageRipple());
+        this.addEffect(new ImageTunnel());
+        this.addEffect(new Eclipse());
+        this.addEffect(new Ripples());
+        this.addEffect(new StarBars());
+        this.addEffect(new Stars());
+        this.addEffect(new LightLeak());
+
+        // Initialize ControlsHandler
+        this.controls = new ControlsHandler();
     }
 
     async init(container: HTMLElement) {
@@ -90,8 +95,25 @@ export class VizController {
         this.audio.init();
         this.fx.init();
 
+        // Load FX configuration and apply to FXManager
+        const fxConfig = await this.config.loadFXConfig();
+        if (fxConfig) {
+            this.fx.setFXConfig(fxConfig);
+        }
+
         // Initialize Effects
         this.effects.forEach(eff => eff.init(this.scene, this.holder, this.tumbler));
+
+        // Initialize GUI Controls
+        this.controls.init(this.container, this.bpm, this.config.config.showControls);
+        this.controls.buildAudioControls(this.audio);
+        this.controls.buildVizControls(this.effects);
+        if (fxConfig) {
+            this.controls.buildFXControls(fxConfig, this.fx);
+        }
+
+        // Sync autoMode between controller and controls
+        this.autoMode = this.controls.params.autoMode;
 
         // Listeners
         this.audio.events.onBeat = () => this.onBeat();
@@ -131,6 +153,9 @@ export class VizController {
         this.sequence.update(); // Check for sequence transitions
 
         // AutoMode: dynamically adjust tilt (from original VizHandler.update)
+        // Sync autoMode from GUI
+        this.autoMode = this.controls.params.autoMode;
+
         if (this.autoMode) {
             this.fx.params.tiltAmount = (this.noise2D(this.noiseTime / 20, 99) + 1) / 2 * 0.25;
             this.fx.params.tiltSpeed = (this.noise2D(this.noiseTime / 20, 9999) + 1) / 2 * 0.25;
@@ -151,6 +176,9 @@ export class VizController {
         });
 
         this.fx.update(1, this.audio);
+
+        // Update controls (Stats, BPM, Audio debug)
+        this.controls.update(this.audio);
     }
 
     onBeat() {

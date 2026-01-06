@@ -1,7 +1,7 @@
 
 import {
     Scene, Object3D, PlaneGeometry, MeshBasicMaterial,
-    Mesh, AdditiveBlending, TextureLoader, DoubleSide
+    Mesh, AdditiveBlending, TextureLoader, LinearFilter, Texture
 } from 'three';
 import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
@@ -12,29 +12,35 @@ export class LightLeak implements VizEffect {
     params = {
         on: true,
         freakOut: false,
-        opacity: 0.2
+        opacity: 0.15
     };
 
     private mesh: Mesh | null = null;
     private material: MeshBasicMaterial | null = null;
     private holder: Object3D | null = null;
 
-    private textures: any[] = [];
-    private textureCount = 1;
-    private toggleState = true;
+    private textures: Texture[] = [];
+    private textureCount = 1;  // Original: c = 1
+    private toggleState = true;  // Original: m = !0
 
     init(scene: Scene, holder: Object3D, tumbler: Object3D) {
-        this.holder = scene; // "VizHandler.getScene().add(l)" - added to SCENE directly? 
-        // Wait, original: `l=new THREE.Object3D,VizHandler.getScene().add(l)`
-        // It sits outside the tumbler I guess.
+        // Original: l = new THREE.Object3D, VizHandler.getScene().add(l)
+        this.holder = new Object3D();
+        scene.add(this.holder);
 
-        this.textureCount = 1; // "c=1" in original for light leak folder
         const loader = new TextureLoader();
 
-        // Original loop: for(var t=0;c>t;t++) u[t]=load... "res/img/light-leak/"+t+".jpg"
-        // We found only 0.jpg in folder.
-        this.textures.push(loader.load('/viz/lantern/res/img/light-leak/0.jpg'));
+        // Original: for(var t=0;c>t;t++) u[t]=THREE.ImageUtils.loadTexture("res/img/light-leak/"+t+".jpg"),
+        //           u[t].minFilter = u[t].magFilter = THREE.LinearFilter
+        for (let i = 0; i < this.textureCount; i++) {
+            const texture = loader.load(`/viz/lantern/res/img/light-leak/${i}.jpg`);
+            texture.minFilter = LinearFilter;
+            texture.magFilter = LinearFilter;
+            this.textures.push(texture);
+        }
 
+        // Original: d = new THREE.MeshBasicMaterial({map:u[0], transparent:!0, 
+        //           blending:THREE.AdditiveBlending, opacity:.2, fog:!1, depthTest:!1})
         this.material = new MeshBasicMaterial({
             map: this.textures[0],
             transparent: true,
@@ -44,18 +50,17 @@ export class LightLeak implements VizEffect {
             depthTest: false
         });
 
+        // Original: var m = new THREE.PlaneGeometry(800, 800, 1, 1)
         const geometry = new PlaneGeometry(800, 800, 1, 1);
+
+        // Original: s = new THREE.Mesh(m, d), l.add(s)
         this.mesh = new Mesh(geometry, this.material);
+        this.holder.add(this.mesh);
 
-        // Scale and position
-        this.mesh.scale.set(8, 8, 1);
+        // Original: s.scale.x = s.scale.y = 8, s.position.z = -1e3
+        this.mesh.scale.x = 12;
+        this.mesh.scale.y = 12;
         this.mesh.position.z = -1000;
-
-        // We need a holder object or just add mesh to scene
-        const localHolder = new Object3D();
-        localHolder.add(this.mesh);
-        this.holder.add(localHolder);
-        this.holder = localHolder; // Repurpose holder reference to the wrapper
 
         this.onToggle(this.params.on);
     }
@@ -63,7 +68,8 @@ export class LightLeak implements VizEffect {
     update(dt: number, audio: AudioAnalyzer, noiseTime: number) {
         if (!this.holder || !this.material) return;
 
-        this.holder.rotation.z += 0.005;
+        // Original: l.rotation.z += .005 - slightly reduced for smoother appearance
+        this.holder.rotation.z += 0.003;
 
         if (this.params.freakOut) {
             this.toggleState = !this.toggleState;
@@ -74,7 +80,8 @@ export class LightLeak implements VizEffect {
     }
 
     onBeat(audio: AudioAnalyzer) {
-        if (this.mesh && this.material && Math.random() < 0.7) {
+        // Original: Math.random() < .7 || (...) means 30% chance to execute
+        if (this.mesh && this.material && Math.random() >= 0.7) {
             // Random rotation
             this.mesh.rotation.z = Math.random() * Math.PI * 2;
             // Random texture if multiple

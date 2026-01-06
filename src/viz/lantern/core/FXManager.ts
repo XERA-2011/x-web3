@@ -17,6 +17,7 @@ import {
 import { AudioAnalyzer } from './AudioAnalyzer';
 import { createNoise2D } from 'simplex-noise';
 import { ATUtil } from './ATUtil';
+import { FXConfig } from './ConfigManager';
 
 export interface FXParams {
     tiltAmount: number;
@@ -25,22 +26,34 @@ export interface FXParams {
     audioFade: number;
     strobe: boolean;
     strobePeriod: number;
+    // New params from the instruction
+    scanlines?: boolean;
+    noise?: boolean;
+    vignette?: boolean;
+    bloom?: boolean;
 }
 
 export class FXManager {
     composer: EffectComposer | null = null;
     passes: any = {};
 
+    // FX Params
     params: FXParams = {
+        scanlines: true,
+        noise: true,
+        vignette: true,
+        bloom: true,
+        strobe: false,
+        strobePeriod: 1, // beats
+        audioFade: 0, // 0 to 1
+        // Original params that might still be used elsewhere
         tiltAmount: 0.1,
         tiltSpeed: 0.15,
         jumpOnBeat: true,
-        audioFade: 0,
-        strobe: false,
-        strobePeriod: 6
     };
 
-    filters: any = {};
+    extraBrightness = 0; // External brightness offset (e.g. for keyframes/intro)
+    filters: FXConfig['filters'] | null = null;
 
     time = 0;
     noise2D = createNoise2D();
@@ -70,6 +83,7 @@ export class FXManager {
         this.passes.barrel = new ShaderPass(BarrelBlurShader);
         this.passes.shake = new ShaderPass(ShakeShader);
         this.passes.colorify = new ShaderPass(ColorShiftShader);
+        this.passes.brightness = new ShaderPass(BrightnessContrastShader);
 
         // Chain Order (from original FXHandler.toggleShaders)
         // Render > Mirror > RGB > Vignette(via super) > brightness > copy
@@ -80,10 +94,16 @@ export class FXManager {
         this.composer.addPass(this.passes.wobble);
         this.composer.addPass(this.passes.barrel);
         this.composer.addPass(this.passes.shake);
-        this.composer.addPass(this.passes.lines);
+        // Original order: [filters] → brightness → copy
+        // For visible lines on dark backgrounds AND proper intro fade:
+        // super (with intro brightness) → brightness (audio only) → lines (unaffected)
         this.composer.addPass(this.passes.super);
+        this.composer.addPass(this.passes.brightness);
+        this.composer.addPass(this.passes.lines);
 
-        this.passes.super.renderToScreen = true;
+        this.passes.lines.renderToScreen = true;
+        this.passes.super.renderToScreen = false;
+        this.passes.brightness.renderToScreen = false;
 
         // --- Initial States from fx.json ---
         this.passes.mirror.enabled = false;    // mirror.on: false
@@ -108,19 +128,21 @@ export class FXManager {
         this.passes.wobble.uniforms.strength.value = 0.01;
         this.passes.wobble.uniforms.size.value = 10;
 
-        // Lines
+        // Lines (strength 0.1 matches original fx.json)
         this.passes.lines.uniforms.strength.value = 0.1;
-        this.passes.lines.uniforms.amount.value = 1500;
+        this.passes.lines.uniforms.amount.value = window.innerWidth * 2; // Dynamic based on screen width
         this.passes.lines.uniforms.angle.value = 0.5;
+
+        // Brightness Pass (separate from super, so lines are not affected)
+        this.passes.brightness.uniforms.brightness.value = -1; // Start dark for intro
 
         // Super Shader (the key one!)
         this.passes.super.uniforms.glowAmount.value = 0.4;
         this.passes.super.uniforms.glowSize.value = 2;
         this.passes.super.uniforms.vigOffset.value = 0.9;
         this.passes.super.uniforms.vigDarkness.value = 1;  // DARK vignette!
-        this.passes.super.uniforms.saturation.value = 0;
-        this.passes.super.uniforms.contrast.value = 0.2;
-        this.passes.super.uniforms.brightness.value = 0;
+        // Super shader handles intro brightness fade (extraBrightness)
+        this.passes.super.uniforms.brightness.value = -1; // Start dark for intro
     }
 
     update(dt: number, audio: AudioAnalyzer) {
@@ -148,18 +170,27 @@ export class FXManager {
         // RGB Shift: angle = 6.28 * (noise(time/40, 99) + 0.5)
         this.passes.rgb.uniforms.angle.value = 6.28 * (this.noise2D(this.time / 40, 99) + 0.5);
 
-        // Super Shader hue: 2 * noise(time/20, 999)
+        // Super Shader hue: Original = 2 * simplexNoise.noise(g / 20, 999, 0)
         this.passes.super.uniforms.hue.value = 2 * this.noise2D(this.time / 20, 999);
 
-        // Brightness (audio fade / strobe logic)
+        // Brightness (audio fade / strobe logic) - applied to SEPARATE brightness pass
+        // This does NOT include extraBrightness (which is handled in super shader for intro)
         let brightness = -(1 - 2 * vol) * this.params.audioFade;
-        brightness = Math.min(brightness, 0);
 
         if (this.params.strobe) {
-            brightness -= (10 * this.time) % this.params.strobePeriod / this.params.strobePeriod;
+            // Simple strobe
+            const strobePhase = Math.sin(this.time * this.params.strobePeriod);
+            if (strobePhase > 0.5) brightness += 0.5;
         }
 
-        this.passes.super.uniforms.brightness.value = brightness;
+        // Audio brightness goes to brightness pass (not intro)
+        this.passes.brightness.uniforms.brightness.value = brightness;
+
+        // Intro brightness goes to super shader (original behavior)
+        this.passes.super.uniforms.brightness.value = this.extraBrightness;
+
+        // Restore RGB shift defaults slowly
+        this.passes.rgb.uniforms.amount.value += (0.005 - this.passes.rgb.uniforms.amount.value) * 0.1;
 
         this.composer.render(0.1);
     }
@@ -176,4 +207,80 @@ export class FXManager {
         this.passes.lines.uniforms.amount.value = width * 2;
         this.passes.super.uniforms.resolution.value.set(width, height);
     }
+
+    setFXConfig(fxConfig: FXConfig) {
+        this.filters = fxConfig.filters;
+        this.updateUniforms();
+        this.onToggleShaders();
+    }
+
+    updateUniforms() {
+        if (!this.filters) return;
+
+        // Update mirror additive mode
+        if (this.filters.mirror) {
+            this.passes.mirror.uniforms.additive.value =
+                this.filters.mirror.params.additive?.value ? 1 : 0;
+        }
+
+        // Update all filter parameters
+        Object.keys(this.filters).forEach(filterKey => {
+            const filter = this.filters![filterKey];
+            const pass = this.passes[filterKey];
+            if (!pass) return;
+
+            Object.keys(filter.params).forEach(paramKey => {
+                const param = filter.params[paramKey];
+                if (param.custom) return; // Skip custom params
+
+                if (pass.uniforms && pass.uniforms[paramKey]) {
+                    pass.uniforms[paramKey].value = param.value;
+                }
+            });
+        });
+    }
+
+    onToggleShaders() {
+        if (!this.composer || !this.filters) return;
+
+        // Rebuild composer
+        this.composer = new EffectComposer(this.renderer);
+        this.composer.addPass(this.passes.render);
+
+        // Add enabled filters
+        Object.keys(this.filters).forEach(filterKey => {
+            const filter = this.filters![filterKey];
+            if (filter.on && this.passes[filterKey]) {
+                this.composer!.addPass(this.passes[filterKey]);
+            }
+        });
+
+        // Always add super shader last
+        this.composer.addPass(this.passes.super);
+        this.passes.super.renderToScreen = true;
+
+        this.updateUniforms();
+        this.resize(window.innerWidth, window.innerHeight);
+    }
+
+    randomizeFilters() {
+        if (!this.filters) return;
+
+        // Turn all off
+        Object.keys(this.filters).forEach(key => {
+            this.filters![key].on = false;
+        });
+
+        // Turn on 2-3 random filters
+        const filterKeys = Object.keys(this.filters);
+        const count = ATUtil.randomInt(2, 4);
+
+        for (let i = 0; i < count; i++) {
+            const randomKey = filterKeys[ATUtil.randomInt(0, filterKeys.length - 1)];
+            this.filters[randomKey].on = true;
+        }
+
+        this.onToggleShaders();
+    }
 }
+

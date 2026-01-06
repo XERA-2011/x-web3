@@ -93,6 +93,9 @@ export class AudioAnalyzer {
     update() {
         if (!this.analyser || !this.context || !this.freqByteData || !this.timeByteData) return;
 
+        // Don't process audio if no source is connected (prevents phantom beats during intro)
+        if (!this.source) return;
+
         // TypeScript strictness override
         this.analyser.getByteFrequencyData(this.freqByteData as any);
         this.analyser.getByteTimeDomainData(this.timeByteData as any);
@@ -132,7 +135,8 @@ export class AudioAnalyzer {
         this.smoothedVolumeHistory.unshift(this.smoothedVolume);
         this.smoothedVolumeHistory.pop();
 
-        if (this.volume > this.beatCutOff && this.volume > this.params.beatThreshold) {
+        // Only trigger beat if we actually have an audio source connected
+        if (this.source && this.volume > this.beatCutOff && this.volume > this.params.beatThreshold) {
             this.events.onBeat();
             this.beatCutOff = this.volume * 1.1;
             this.beatTime = 0;

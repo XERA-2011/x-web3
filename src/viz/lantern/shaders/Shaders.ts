@@ -174,11 +174,14 @@ export const LinesShader = {
     varying vec2 vUv;
     void main() {
       vec4 col = texture2D(tDiffuse, vUv);
-      col += sin(vUv.x*amount*(1.0-angle)+vUv.y*amount*angle)*strength;
+      // Shift sin from [-1,1] to [0,1] to create grayish scanlines always visible
+      float scanline = (sin(vUv.x*amount*(1.0-angle)+vUv.y*amount*angle) + 1.0) * 0.5;
+      col.rgb += scanline * strength;
       gl_FragColor = col;
     }
   `,
 };
+
 
 export const MirrorShader = {
   uniforms: {

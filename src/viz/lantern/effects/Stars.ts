@@ -79,13 +79,10 @@ export class Stars implements VizEffect {
     update(dt: number, audio: AudioAnalyzer, noiseTime: number) {
         if (!this.mesh || !this.geometry || !this.material) return;
 
-        // Increment noise time (original: VizHandler.getNoiseTime() increments by 0.01)
-        this.noiseTime += 0.01;
-
         // Original color logic:
         // l = (simplexNoise.noise(VizHandler.getNoiseTime()/5, 0, 0) + 1) / 2
         // r.color.setHSL(l, 0.8, 0.8)
-        const l = (this.noise2D(this.noiseTime / 5, 0) + 1) / 2;
+        const l = (this.noise2D(noiseTime / 5, 0) + 1) / 2;
         this.material.color.setHSL(l, 0.8, 0.8);
 
         // Original: r.opacity = d.opacity
@@ -100,7 +97,7 @@ export class Stars implements VizEffect {
 
         for (let i = 0; i < this.particleCount; i++) {
             const particle = this.particleData[i];
-            const t = (particle.initPos + this.noiseTime * this.params.speed / 10) % 1;
+            const t = (particle.initPos + noiseTime * this.params.speed / 10) % 1;
             const z = t * 3000 - 1000;  // Range -1000 to 2000
 
             positions[i * 3 + 2] = z;

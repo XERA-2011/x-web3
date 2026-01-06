@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 import { VizController } from '../../../viz/lantern/core/VizController';
 
 export default function LanternContainer() {
@@ -19,8 +20,29 @@ export default function LanternContainer() {
         controllerRef.current = controller;
 
         controller.init(containerRef.current).then(() => {
-            setLoading(false);
+            controller.getEffect("LightLeak")?.onToggle(true);
+            controller.getEffect("Stars")?.onToggle(true);
+            controller.getEffect("StarBars")?.onToggle(true);
+
+            // Double Ensure Initial Darkness
+            controller.fx.extraBrightness = -1;
+
+            // Start animation loop to render the first black frame
             animate();
+
+            // Fade in background effects via extraBrightness (matching original TweenMax.fromTo)
+            // Original: TweenMax.fromTo(u["super"].uniforms.brightness, 2, {value:-1}, {value:0})
+            gsap.fromTo(controller.fx,
+                { extraBrightness: -1 },
+                {
+                    extraBrightness: 0,
+                    duration: 2, // Original: 2 seconds
+                    ease: "power1.out" // TweenMax default easing
+                }
+            );
+
+            // Reveal canvas only after setup
+            setLoading(false);
         });
 
         let animationId: number;
@@ -31,8 +53,28 @@ export default function LanternContainer() {
 
         return () => {
             cancelAnimationFrame(animationId);
+            // Optional: Cleanup controller resources if needed
+            // controller.dispose(); 
         };
     }, []);
+
+    // Handle UI Fade In when loading finishes
+    useEffect(() => {
+        if (!loading && showOverlay) {
+            // Wait for next frame to ensure DOM is rendered
+            const timer = setTimeout(() => {
+                // Staggered fade in for Logo, Title, Prompt, Options
+                gsap.to(".intro-el", {
+                    opacity: 1,
+                    duration: 2,
+                    stagger: 0.5,
+                    delay: 0.5, // Start 0.5s after background begins
+                    ease: "sine.inOut" // Gentle easing
+                });
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+    }, [loading, showOverlay]);
 
     const start = () => {
         setShowOverlay(false);
@@ -59,16 +101,15 @@ export default function LanternContainer() {
             ctrl.audio.params.gain = 1.5;
             ctrl.audio.params.beatHoldTime = 80;
 
-            // Fade in from black (original: TweenMax.fromTo brightness -1 to 0)
-            ctrl.fx.passes.super.uniforms.brightness.value = -1;
-            const fadeIn = () => {
-                const bv = ctrl.fx.passes.super.uniforms.brightness.value;
-                if (bv < 0) {
-                    ctrl.fx.passes.super.uniforms.brightness.value = Math.min(bv + 0.02, 0);
-                    requestAnimationFrame(fadeIn);
-                }
-            };
-            fadeIn();
+            // Fade in from black using extraBrightness
+            // Original viz-start: TweenMax.fromTo(brightness, 1, {value:-1}, {value:0})
+            ctrl.fx.extraBrightness = -1;
+
+            gsap.to(ctrl.fx, {
+                extraBrightness: 0,
+                duration: 1, // Original: 1 second for viz-start
+                ease: 'power1.out'
+            });
         }
     };
 
@@ -108,16 +149,14 @@ export default function LanternContainer() {
         if (controllerRef.current) {
             const ctrl = controllerRef.current;
 
-            // Fade in from black
-            ctrl.fx.passes.super.uniforms.brightness.value = -1;
-            const fadeIn = () => {
-                const bv = ctrl.fx.passes.super.uniforms.brightness.value;
-                if (bv < 0) {
-                    ctrl.fx.passes.super.uniforms.brightness.value = Math.min(bv + 0.02, 0);
-                    requestAnimationFrame(fadeIn);
-                }
-            };
-            fadeIn();
+            // Fade in from black using extraBrightness
+            ctrl.fx.extraBrightness = -1;
+
+            gsap.to(ctrl.fx, {
+                extraBrightness: 0,
+                duration: 1,
+                ease: 'power1.out'
+            });
         }
     };
 
@@ -126,47 +165,79 @@ export default function LanternContainer() {
         // Implement drag drop if possible, or just click
     };
 
+    useEffect(() => {
+        // Prevent body scroll and overscroll rubber-banding
+        document.body.style.overflow = 'hidden';
+        document.body.style.overscrollBehavior = 'none';
+        document.body.style.backgroundColor = 'black';
+
+        return () => {
+            document.body.style.overflow = '';
+            document.body.style.overscrollBehavior = '';
+            document.body.style.backgroundColor = '';
+        };
+    }, []);
+
     return (
-        <div className="relative w-full h-screen bg-black overflow-hidden font-sans text-white select-none">
+        <div className="fixed inset-0 bg-black overflow-hidden font-sans text-white select-none overscroll-none">
             <div ref={containerRef} className="absolute inset-0 z-0 bg-black" />
 
-            {/* Loading */}
+            {/* Loading - Hidden as per request, just black screen */}
             {loading && (
-                <div className="absolute inset-0 flex items-center justify-center z-50 bg-black">
-                    <img src="/viz/lantern/res/img/intro/loader.gif" alt="Loading..." />
-                </div>
+                <div className="absolute inset-0 z-50 bg-black" />
             )}
 
             {/* Intro Overlay */}
             {showOverlay && !loading && (
                 <div
                     id="intro"
-                    className="absolute inset-0 z-40 flex flex-col items-center justify-center text-center animate-fade-in"
-                // Transparent background as requested
+                    className="absolute inset-0 z-40 flex flex-col items-center justify-center text-center font-sans"
                 >
-                    <h1 className="mb-4">
-                        <img src="/viz/lantern/res/img/intro/logo-400.png" alt="ÜberViz" className="w-[400px] h-auto" />
+                    <h1 className="mb-2 opacity-0 intro-el">
+                        <img src="/viz/lantern/res/img/intro/logo-400.png" alt="ÜberViz" className="w-[400px] h-auto mx-auto" />
                     </h1>
-                    <h2 className="text-sm tracking-[0.3em] font-light text-gray-300 mb-8 uppercase text-shadow">Realtime Music Visualizer</h2>
+                    <h2 className="text-[12px] tracking-[0.3em] font-normal text-[#999] mb-12 uppercase opacity-0 intro-el" style={{ textShadow: '0 1px 1px rgba(0,0,0,0.5)' }}>Realtime Music Visualizer</h2>
 
-                    <div id="prompt" className="text-xs text-gray-500 mb-12 uppercase tracking-wide opacity-50 hidden">Drop MP3 here</div>
+                    <div id="prompt" className="text-xs text-gray-500 mb-12 uppercase tracking-wide opacity-0 intro-el hidden">Drop MP3 here</div>
 
-                    <div id="sound-options" className="flex gap-12 text-center">
-                        <div className="option clickable group cursor-pointer" onClick={handleStartMic}>
-                            <h3 className="uppercase text-xs tracking-widest text-gray-400 mb-4 group-hover:text-white transition-colors border-b border-transparent group-hover:border-white pb-1">Use Microphone</h3>
-                            <div className="icon mic w-[60px] h-[60px] bg-[url('/viz/lantern/res/img/intro/mic.svg')] bg-no-repeat bg-center opacity-70 group-hover:opacity-100 transition-all mx-auto"></div>
+                    <div id="sound-options" className="flex gap-20 text-center items-start justify-center opacity-0 intro-el">
+                        <div className="option clickable group cursor-pointer flex flex-col items-center" id="option-mic" onClick={handleStartMic}>
+                            <h3 className="uppercase text-[10px] tracking-[0.2em] text-[#666] mb-5 group-hover:text-white transition-colors border-b border-transparent group-hover:border-white pb-1 underline-offset-4 font-bold">Use Microphone</h3>
+                            <div className="icon mic w-[60px] h-[78px] bg-[url('/viz/lantern/res/img/intro/mic.svg')] bg-no-repeat bg-center opacity-70 group-hover:opacity-100 transition-all"></div>
                         </div>
 
-                        <div className="option clickable group cursor-pointer" onClick={handleSample}>
-                            <h3 className="uppercase text-xs tracking-widest text-gray-400 mb-4 group-hover:text-white transition-colors border-b border-transparent group-hover:border-white pb-1">Play Sample Music</h3>
-                            <div className="icon play w-[60px] h-[60px] bg-[url('/viz/lantern/res/img/intro/controller-play.svg')] bg-no-repeat bg-center opacity-70 group-hover:opacity-100 transition-all mx-auto"></div>
-                            <p className="text-[10px] text-gray-500 mt-2 font-mono">"Lantern"<br />by Sbtrkt</p>
+                        <div className="option clickable group cursor-pointer flex flex-col items-center" id="option-sample" onClick={handleSample}>
+                            <h3 className="uppercase text-[10px] tracking-[0.2em] text-[#666] mb-5 group-hover:text-white transition-colors border-b border-transparent group-hover:border-white pb-1 underline-offset-4 font-bold">Play Sample Music</h3>
+                            <div className="icon play w-[60px] h-[78px] bg-[url('/viz/lantern/res/img/intro/controller-play.svg')] bg-no-repeat bg-center opacity-70 group-hover:opacity-100 transition-all"></div>
+                            <p className="text-[9px] text-[#444] mt-2 font-mono leading-relaxed group-hover:text-[#666] transition-colors">"Lantern"<br />by Sbtrkt</p>
                         </div>
 
-                        <div className="option group cursor-not-allowed opacity-50">
-                            <h3 className="uppercase text-xs tracking-widest text-gray-400 mb-4">Load MP3</h3>
-                            <div className="icon mp3 w-[60px] h-[60px] mx-auto bg-gray-800 rounded-full flex items-center justify-center text-xs">MP3</div>
-                            <p className="text-[10px] text-gray-500 mt-2 font-mono">Drag and Drop<br />MP3 file here.</p>
+                        <div
+                            className="option clickable group cursor-pointer flex flex-col items-center"
+                            onClick={() => document.getElementById('file-upload')?.click()}
+                        >
+                            <h3 className="uppercase text-[10px] tracking-[0.2em] text-[#666] mb-5 group-hover:text-white transition-colors border-b border-transparent group-hover:border-white pb-1 underline-offset-4 font-bold">Load MP3</h3>
+                            <div className="icon mp3 w-[60px] h-[78px] bg-[url('/viz/lantern/res/img/intro/music.svg')] bg-no-repeat bg-center opacity-70 group-hover:opacity-100 transition-all"></div>
+                            <p className="text-[9px] text-[#444] mt-2 font-mono leading-relaxed group-hover:text-[#666] transition-colors">Click or Drag and Drop<br />MP3 file here.</p>
+                            <input
+                                type="file"
+                                id="file-upload"
+                                className="hidden"
+                                accept="audio/*,.mp3"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        const url = URL.createObjectURL(file);
+                                        const audio = new Audio(url);
+                                        // Simple file play logic, skipping sequence handler for now or treat as sample
+                                        if (controllerRef.current) {
+                                            controllerRef.current.audio.loadAudioElement(audio);
+                                            audio.play();
+                                            start();
+                                        }
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
@@ -211,11 +282,13 @@ export default function LanternContainer() {
 
             {/* Info Button (Intro) */}
             {showOverlay && !loading && !showInfo && (
-                <div
-                    className="absolute top-4 right-4 z-50 cursor-pointer opacity-50 hover:opacity-100 transition-opacity"
-                    onClick={() => setShowInfo(true)}
-                >
-                    <div className="w-8 h-8 rounded-full border border-white flex items-center justify-center font-serif italic text-white">i</div>
+                <div className="absolute top-4 right-4 z-50 intro-el opacity-0">
+                    <div
+                        className="cursor-pointer opacity-50 hover:opacity-100 transition-opacity"
+                        onClick={() => setShowInfo(true)}
+                    >
+                        <div className="w-8 h-8 rounded-full border border-white flex items-center justify-center font-serif italic text-white">i</div>
+                    </div>
                 </div>
             )}
         </div>
