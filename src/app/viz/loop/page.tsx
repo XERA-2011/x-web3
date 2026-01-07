@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Script from 'next/script'; // Not used but good practice if we needed external scripts
 import { LoopApp } from '@/viz/loop/LoopApp';
-import AudioFile from '@/viz/loop/res/audio/EMDCR.mp3';
+
+const AudioFile = '/viz/loop/audio/EMDCR.mp3';
 
 export default function LoopPage() {
     const containerRef = useRef<HTMLDivElement>(null);

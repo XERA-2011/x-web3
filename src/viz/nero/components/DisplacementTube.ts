@@ -3,29 +3,25 @@ import { NeroApp } from '../NeroApp';
 import { DisplacementMatShader } from '../shaders/NeroShaders';
 import { ATUtil } from '../../common/ATUtil';
 
-// Import all 18 images explicitly
-import D00 from '../res/img/disp-tube/00.jpg';
-import D01 from '../res/img/disp-tube/01.jpg';
-import D02 from '../res/img/disp-tube/02.jpg';
-import D03 from '../res/img/disp-tube/03.jpg';
-import D04 from '../res/img/disp-tube/04.jpg';
-import D05 from '../res/img/disp-tube/05.jpg';
-import D06 from '../res/img/disp-tube/06.jpg';
-import D07 from '../res/img/disp-tube/07.jpg';
-import D08 from '../res/img/disp-tube/08.jpg';
-import D09 from '../res/img/disp-tube/09.jpg';
-import D10 from '../res/img/disp-tube/10.jpg';
-import D11 from '../res/img/disp-tube/11.jpg';
-import D12 from '../res/img/disp-tube/12.jpg';
-import D13 from '../res/img/disp-tube/13.jpg';
-import D14 from '../res/img/disp-tube/14.jpg';
-import D15 from '../res/img/disp-tube/15.jpg';
-import D16 from '../res/img/disp-tube/16.jpg';
-import D17 from '../res/img/disp-tube/17.jpg';
-
 const TEXTURE_IMAGES = [
-    D00, D01, D02, D03, D04, D05, D06, D07, D08, D09,
-    D10, D11, D12, D13, D14, D15, D16, D17
+    '/viz/nero/img/disp-tube/00.jpg',
+    '/viz/nero/img/disp-tube/01.jpg',
+    '/viz/nero/img/disp-tube/02.jpg',
+    '/viz/nero/img/disp-tube/03.jpg',
+    '/viz/nero/img/disp-tube/04.jpg',
+    '/viz/nero/img/disp-tube/05.jpg',
+    '/viz/nero/img/disp-tube/06.jpg',
+    '/viz/nero/img/disp-tube/07.jpg',
+    '/viz/nero/img/disp-tube/08.jpg',
+    '/viz/nero/img/disp-tube/09.jpg',
+    '/viz/nero/img/disp-tube/10.jpg',
+    '/viz/nero/img/disp-tube/11.jpg',
+    '/viz/nero/img/disp-tube/12.jpg',
+    '/viz/nero/img/disp-tube/13.jpg',
+    '/viz/nero/img/disp-tube/14.jpg',
+    '/viz/nero/img/disp-tube/15.jpg',
+    '/viz/nero/img/disp-tube/16.jpg',
+    '/viz/nero/img/disp-tube/17.jpg'
 ];
 
 export class DisplacementTube {
@@ -55,7 +51,7 @@ export class DisplacementTube {
     constructor(app: NeroApp) {
         this.app = app;
         this.container = new THREE.Object3D();
-        this.app.scene.add(this.container);
+        this.app.vizHolder.add(this.container);
 
         // Load textures
         const loader = new THREE.TextureLoader();

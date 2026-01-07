@@ -29,20 +29,20 @@ export class FXHandler {
 
     public params = {
         mirror: false,
-        RGBShift: false,
-        film: false,
+        RGBShift: true,           // 原版默认开启
+        film: true,               // 原版默认开启
         audioLevels: false,
         strobe: false,
-        strobePeriod: 15,
-        tiltAmount: 0,
-        tiltSpeed: 0,
-        glowAmount: 0,
-        glowSize: 0,
-        vignetteAmount: 0,
-        brightness: 0,
-        contrast: 0,
-        saturation: 0,
-        hueSpeed: 0.1
+        strobePeriod: 2,
+        tiltAmount: 0.3,
+        tiltSpeed: 0.15,
+        glowAmount: 0.3,          // 降低光晕强度
+        glowSize: 2,
+        vignetteAmount: 0.5,
+        brightness: 0.8,
+        contrast: 0.2,
+        saturation: 0.3,
+        hueSpeed: 1
     };
 
     constructor(app: NeroApp) {
@@ -58,13 +58,14 @@ export class FXHandler {
 
         this.brightnessContrastPass = new ShaderPass(BrightnessContrastShader);
         this.superPass = new ShaderPass(SuperShader);
+        this.superPass.uniforms.vigDarkness.value = 2; // 原版默认值
         this.mirrorPass = new ShaderPass(MirrorShader);
         this.mirrorPass.uniforms.side.value = 2;
 
         this.rgbShiftPass = new ShaderPass(RGBShiftShader);
         this.filmPass = new ShaderPass(FilmShader);
         this.filmPass.uniforms.grayscale.value = 0;
-        this.filmPass.uniforms.sIntensity.value = 0.6;
+        this.filmPass.uniforms.sIntensity.value = 0.5;  // 微调：0.6 -> 0.5
         this.filmPass.uniforms.nIntensity.value = 0.4;
 
         this.outputPass = new OutputPass();
@@ -74,44 +75,21 @@ export class FXHandler {
     }
 
     setupComposer() {
-        // Clear existing passes logic if needed, but EffectComposer doesn't expose clean 'clear' method easily in typedefs usually.
-        // We will just recreate passes array if possible or just add them if NeroApp is empty.
-        // NeroApp had RenderPass. We can insert ours.
-
-        // Let's reset composer in NeroApp if possible or just access passes.
+        // Add all passes, control via enabled flag
         this.composer.passes = [];
         this.composer.addPass(this.renderPass);
-
-        if (this.params.audioLevels || this.params.brightness !== 0 || this.params.contrast !== 0) {
-            this.composer.addPass(this.brightnessContrastPass);
-        }
-
-        this.composer.addPass(this.superPass); // Always super? main.js says "if j.super" but it seems to default true or handled by params? 
-        // In main.js: j.super && i.addPass(h)
-        // We probably should toggle enabled.
-
-        if (this.params.mirror) this.composer.addPass(this.mirrorPass);
-        if (this.params.RGBShift) this.composer.addPass(this.rgbShiftPass);
-        if (this.params.film) this.composer.addPass(this.filmPass);
-
-        // this.composer.addPass(this.outputPass); // Or CopyShader
-    }
-
-    rebuildStack() {
-        this.composer.passes = [];
-        this.composer.addPass(this.renderPass);
-        // Dynamic stack based on active params to save perf is what main.js did
-
-        // Always add them but toggle enabled? 
-        // Three.js Composer executes all added passes unless enabled=false.
-        // Let's add all and toggle enabled.
-
         this.composer.addPass(this.brightnessContrastPass);
         this.composer.addPass(this.superPass);
         this.composer.addPass(this.mirrorPass);
         this.composer.addPass(this.rgbShiftPass);
         this.composer.addPass(this.filmPass);
         this.composer.addPass(this.outputPass);
+    }
+
+    rebuildStack() {
+        // Alias for compatibility
+        this.setupComposer();
+        this.updateParams();
     }
 
     onResize() {
@@ -134,7 +112,7 @@ export class FXHandler {
         this.mirrorPass.enabled = this.params.mirror;
         this.rgbShiftPass.enabled = this.params.RGBShift;
         this.filmPass.enabled = this.params.film;
-        this.brightnessContrastPass.enabled = this.params.audioLevels || this.params.brightness !== 0 || this.params.contrast !== 0;
+        this.brightnessContrastPass.enabled = true; // 始终启用
 
         // Initial setup
         this.onResize();
@@ -144,14 +122,16 @@ export class FXHandler {
         this.time += 0.1;
         this.hueSpeed += 0.01 * this.params.hueSpeed;
 
+
+
         this.filmPass.uniforms.time.value = this.time;
 
         this.rgbShiftPass.uniforms.angle.value = Math.sin(this.time / 6) * Math.PI * 2;
 
-        // RGB Shift Amount logic
-        let shiftAmount = 0.02 * (0.5 + (this.app.audioHandler ? this.app.audioHandler.getVolume() / 2 : 0));
-        // Original: .02 * (j.rgbAmount + AudioHandler.getVolume() / 2) * 800 / VizHandler.getVizWidth()
-        // Simplify for now
+        // RGB Shift Amount - 原版: .02 * (j.rgbAmount + AudioHandler.getVolume() / 2) * 800 / VizHandler.getVizWidth()
+        const rgbAmount = 0.15; // 原版 rgbAmount 默认值
+        const vol = this.app.audioHandler ? this.app.audioHandler.getVolume() : 0;
+        const shiftAmount = 0.02 * (rgbAmount + vol / 2) * 800 / window.innerWidth;
         this.rgbShiftPass.uniforms.amount.value = shiftAmount;
 
         // Hue
@@ -170,5 +150,14 @@ export class FXHandler {
         }
 
         this.brightnessContrastPass.uniforms.brightness.value = b;
+    }
+
+    // Alias methods for ControlsHandler compatibility
+    toggleShaders() {
+        this.updateParams();
+    }
+
+    setShaderParams() {
+        this.updateParams();
     }
 }

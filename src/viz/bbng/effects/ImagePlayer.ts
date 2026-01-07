@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import { BbngApp } from '../BbngApp';
-import Img0 from '../res/img/0.png';
-import Img1 from '../res/img/1.png';
-import Img2 from '../res/img/2.png';
-import Img3 from '../res/img/3.png';
 
-const IMAGES = [Img0, Img1, Img2, Img3];
+const IMAGES = [
+    '/viz/bbng/img/0.png',
+    '/viz/bbng/img/1.png',
+    '/viz/bbng/img/2.png',
+    '/viz/bbng/img/3.png'
+];
 
 export class ImagePlayer {
     private app: BbngApp;

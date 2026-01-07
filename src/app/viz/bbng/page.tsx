@@ -26,7 +26,7 @@ export default function BbngPage() {
         setLoading(true);
         setStarted(true);
 
-        const audioUrl = '/viz/bbng/mp3/BBNG_Confessions_edit.mp3';
+        const audioUrl = '/viz/bbng/audio/BBNG_Confessions_edit.mp3';
 
         await appRef.current.initAudio(audioUrl);
         setLoading(false);

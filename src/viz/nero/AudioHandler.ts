@@ -1,7 +1,7 @@
 export class AudioHandler {
     private context: AudioContext;
     private analyser: AnalyserNode;
-    private gain: GainNode;
+    private gainNode: GainNode;
     private source: AudioBufferSourceNode | null = null;
     private audioBuffer: AudioBuffer | null = null;
 
@@ -18,14 +18,23 @@ export class AudioHandler {
     private binCount: number;
     private levelBinCount = 16;
     private historyLength = 256;
-    private smoothing = 0.5;
+
+    // Public params for GUI
+    public params = {
+        useMic: false,
+        autoPlayAudio: false,
+        showDebug: false,
+        mute: false,
+        gain: 1,
+        beatHoldTime: 30,
+        beatDecayRate: 0.97,
+        beatThreshold: 0.15,
+        smoothing: 0.5
+    };
 
     // Beat Detection
     private beatCutOff = 0;
-    private beatThreshold = 0.3; // Default threshold, auto-adjusts
     private beatTime = 0;
-    private beatHoldTime = 15; // Frames to hold before next beat
-    private beatDecayRate = 0.98;
 
     // Status
     public isPlaying = false;
@@ -41,9 +50,9 @@ export class AudioHandler {
         this.freqByteData = new Uint8Array(this.binCount);
         this.timeByteData = new Uint8Array(this.binCount);
 
-        this.gain = this.context.createGain();
-        this.analyser.connect(this.gain);
-        this.gain.connect(this.context.destination);
+        this.gainNode = this.context.createGain();
+        this.analyser.connect(this.gainNode);
+        this.gainNode.connect(this.context.destination);
 
         // Init levels
         for (let i = 0; i < this.levelBinCount; i++) {
@@ -52,6 +61,10 @@ export class AudioHandler {
         for (let i = 0; i < this.historyLength; i++) {
             this.volumeHistory.push(0);
         }
+    }
+
+    updateMute() {
+        this.gainNode.gain.value = this.params.mute ? 0 : this.params.gain;
     }
 
     async loadAudio(url: string) {
@@ -105,16 +118,16 @@ export class AudioHandler {
         }
 
         // Simple Beat Detection
-        if (this.volume > this.beatCutOff && this.volume > this.beatThreshold) {
+        if (this.volume > this.beatCutOff && this.volume > this.params.beatThreshold) {
             this.onBeat();
             this.beatCutOff = this.volume * 1.1;
             this.beatTime = 0;
         } else {
-            if (this.beatTime <= this.beatHoldTime) {
+            if (this.beatTime <= this.params.beatHoldTime) {
                 this.beatTime++;
             } else {
-                this.beatCutOff *= this.beatDecayRate;
-                this.beatCutOff = Math.max(this.beatCutOff, this.beatThreshold);
+                this.beatCutOff *= this.params.beatDecayRate;
+                this.beatCutOff = Math.max(this.beatCutOff, this.params.beatThreshold);
             }
         }
     }

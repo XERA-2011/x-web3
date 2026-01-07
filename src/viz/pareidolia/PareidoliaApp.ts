@@ -8,9 +8,9 @@ import { GlitchPass } from './shaders/GlitchPass';
 import { mBox } from './components/mBox';
 
 // Assets
-import StarsImg from './res/img/stars.jpg';
-import StripesImg from './res/img/stripes.jpg';
-import Stripes2Img from './res/img/stripes2.jpg';
+const StarsImg = '/viz/pareidolia/img/stars.jpg';
+const StripesImg = '/viz/pareidolia/img/stripes.jpg';
+const Stripes2Img = '/viz/pareidolia/img/stripes2.jpg';
 
 import { TextureLoader } from 'three';
 

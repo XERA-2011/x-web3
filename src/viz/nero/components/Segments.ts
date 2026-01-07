@@ -66,7 +66,7 @@ export class Segments {
     constructor(app: NeroApp) {
         this.app = app;
         this.container = new THREE.Object3D();
-        this.app.scene.add(this.container);
+        this.app.vizHolder.add(this.container);
 
         this.material = new THREE.MeshNormalMaterial({
             transparent: true,

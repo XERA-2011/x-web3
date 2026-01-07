@@ -44,7 +44,8 @@ export interface FXConfig {
 
 import DefaultConfig from '../res/config/default.json';
 import FxConfig from '../res/config/fx.json';
-import LanternAudio from '../res/mp3/Lantern.mp3';
+
+const LanternAudio = '/viz/lantern/audio/Lantern.mp3';
 
 // ... interface definitions ...
 

@@ -2,14 +2,15 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { SpliceApp } from '@/viz/splice/SpliceApp';
-import AudioFile from '@/viz/splice/res/scream/scream.mp3';
-import SeqFile from '@/viz/splice/res/scream/seq.json';
+
+const AudioFile = '/viz/splice/audio/scream.mp3';
+const SeqFile = '/viz/splice/data/seq.json';
 
 export default function SplicePage() {
     const containerRef = useRef<HTMLDivElement>(null);
     const appRef = useRef<SpliceApp | null>(null);
-    const [loading, setLoading] = useState(false);
     const [started, setStarted] = useState(false);
+    const [audioLoaded, setAudioLoaded] = useState(false);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -17,61 +18,67 @@ export default function SplicePage() {
         const app = new SpliceApp(containerRef.current);
         appRef.current = app;
 
+        // Auto init visuals and load audio
+        const init = async () => {
+            await app.init(SeqFile);
+            await app.loadAudio(AudioFile);
+            setAudioLoaded(true);
+        };
+        init();
+
         return () => {
             app.dispose();
         };
     }, []);
 
     const handleStart = async () => {
-        if (!appRef.current || started) return;
+        if (!appRef.current || !audioLoaded || started) return;
 
-        setLoading(true);
+        appRef.current.play();
         setStarted(true);
-
-        const audioUrl = AudioFile;
-        // JSON import in Next.js/Webpack usually returns the object directly
-        const seqUrl = SeqFile;
-
-        // We might need to adjust init to accept object instead of URL, or stringify it to blob url?
-        // Let's check SpliceApp.ts. It likely fetches the JSON.
-        // If we pass an object, we need to modify SpliceApp. 
-        // OR we can pass the URL if imported as resource?
-        // Actually, for JSON, `import x from 'y.json'` gives the object.
-        // If SpliceApp expects a URL to fetch, we should probably change SpliceApp to accept the data directly.
-
-        await appRef.current.init(audioUrl, seqUrl);
-        setLoading(false);
     };
 
     return (
-        <div className="w-full h-screen bg-black overflow-hidden relative touch-none">
+        <div className="w-full h-screen bg-black overflow-hidden relative touch-none select-none">
             <div ref={containerRef} className="absolute inset-0" />
 
+            {/* Title */}
+            <div className="absolute top-8 left-8 text-white/50 text-xl font-light tracking-wide font-sans pointer-events-none z-10">
+                Henry Fong & J-Trick - Scream
+            </div>
+
+            {/* About Button */}
+            <div className="absolute top-8 right-8 border border-white/30 px-6 py-2 text-white/70 text-sm tracking-widest cursor-pointer hover:bg-white/10 hover:text-white transition-all font-sans z-10 w-24 text-center">
+                ABOUT
+            </div>
+
+            {/* Play Button Overlay */}
             {!started && (
                 <div
-                    className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 cursor-pointer hover:bg-black/70 transition-colors"
-                    onClick={handleStart}
+                    className={`absolute inset-0 flex items-center justify-center z-50 transition-opacity duration-500 ${audioLoaded ? 'opacity-100' : 'opacity-0'}`}
                 >
-                    <div className="text-white font-oswald text-2xl tracking-widest border border-white px-8 py-4 hover:bg-white hover:text-black transition-colors">
-                        CLICK TO START (SPLICE)
+                    {/* Circle */}
+                    <div
+                        className="w-24 h-24 rounded-full border border-white/50 flex items-center justify-center cursor-pointer group hover:scale-110 hover:border-white transition-all duration-300 bg-black/20 backdrop-blur-sm"
+                        onClick={handleStart}
+                    >
+                        {/* Triangle */}
+                        <div className="w-0 h-0 border-t-[15px] border-t-transparent border-l-[26px] border-l-white border-b-[15px] border-b-transparent ml-2 opacity-80 group-hover:opacity-100 transition-opacity" />
                     </div>
                 </div>
             )}
 
-            {loading && (
+            {/* Loading Indicator */}
+            {!audioLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
-                    <div className="text-white font-mono animate-pulse">
+                    <div className="text-white/30 font-mono text-xs animate-pulse tracking-widest">
                         LOADING DATA...
                     </div>
                 </div>
             )}
 
-            <div className={`absolute top-5 right-5 text-gray-500 font-mono text-xs pointer-events-none transition-opacity duration-500 ${started ? 'opacity-100' : 'opacity-0'}`}>
-                SPLICE VISUALIZER
-            </div>
-
-            <div className={`absolute bottom-5 left-5 text-gray-600 font-mono text-xs max-w-md pointer-events-none transition-opacity duration-500 ${started ? 'opacity-100' : 'opacity-0'}`}>
-                Henry Fong & J-Trick - Scream
+            <div className={`absolute bottom-5 left-5 text-gray-600 font-mono text-xs max-w-md pointer-events-none transition-opacity duration-300 ${started ? 'opacity-0' : 'opacity-100'}`}>
+                spline (viz)
             </div>
         </div>
     );

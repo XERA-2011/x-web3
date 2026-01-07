@@ -3,7 +3,8 @@ import {
     TextureLoader, DoubleSide, BoxGeometry, TetrahedronGeometry, Texture
 } from 'three';
 import gsap from 'gsap';
-import ParticleImg from '../../res/img/particle.png';
+
+const ParticleImg = '/viz/splice/img/particle.png';
 
 let glowTexture: Texture | null = null;
 const boxSize = 5;

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { PareidoliaApp } from '@/viz/pareidolia/PareidoliaApp';
-import AudioFile from '@/viz/pareidolia/res/mp3/Szerencsetlen_edit03.mp3';
+
+const AudioFile = '/viz/pareidolia/audio/Szerencsetlen_edit03.mp3';
 
 export default function PareidoliaPage() {
     const containerRef = useRef<HTMLDivElement>(null);

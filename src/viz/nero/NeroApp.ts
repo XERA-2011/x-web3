@@ -8,7 +8,10 @@ import { LightLeak } from './components/LightLeak';
 import { ImagePlayer } from './components/ImagePlayer';
 import { DisplacementTube } from './components/DisplacementTube';
 import { FXHandler } from './FXHandler';
-import AudioFile from './res/mp3/Nero_In_The_Way.mp3';
+import { ControlsHandler } from './ControlsHandler';
+import { createNoise2D } from 'simplex-noise';
+
+const AudioFile = '/viz/nero/audio/Nero_In_The_Way.mp3';
 
 export class NeroApp {
     public container: HTMLElement;
@@ -17,7 +20,13 @@ export class NeroApp {
     public renderer: THREE.WebGLRenderer;
     public composer: EffectComposer;
     public clock: THREE.Clock;
+    public vizHolder: THREE.Object3D;
     private animationId: number | null = null;
+    private noise2D = createNoise2D();
+    private noiseTime = 0;
+    private raycaster = new THREE.Raycaster();
+    private mouse = new THREE.Vector2();
+    public isPlaying = false;
 
     // Components
     public audioHandler: AudioHandler;
@@ -28,12 +37,16 @@ export class NeroApp {
     public imagePlayer: ImagePlayer;
     public displacementTube: DisplacementTube;
     public fxHandler: FXHandler;
+    public controlsHandler: ControlsHandler;
 
     constructor(container: HTMLElement) {
         this.container = container;
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
         this.camera.position.z = 1000;
+
+        this.vizHolder = new THREE.Object3D();
+        this.scene.add(this.vizHolder);
 
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -57,6 +70,9 @@ export class NeroApp {
 
         this.fxHandler = new FXHandler(this);
 
+        // Initialize Controls (dat.gui)
+        this.controlsHandler = new ControlsHandler(this);
+
         this.initEvents();
         this.start();
     }
@@ -64,13 +80,9 @@ export class NeroApp {
     private initEvents() {
         window.addEventListener('resize', this.onResize);
 
-        // Resume Audio Context on click
-        window.addEventListener('click', () => {
-            if (this.audioHandler) {
-                this.audioHandler.resume();
-                this.audioHandler.play();
-            }
-        });
+        // Resume Audio Context on click (modified for logo interaction)
+        window.addEventListener('click', this.onClick);
+        window.addEventListener('mousemove', this.onMouseMove);
 
         window.addEventListener('onBeat', this.onBeat);
     }
@@ -107,17 +119,68 @@ export class NeroApp {
         // const delta = this.clock.getDelta();
         // const time = this.clock.getElapsedTime();
 
+        // Update VizHolder Rotation
+        if (this.fxHandler) { // Always rotate
+            this.noiseTime += 0.01 * this.fxHandler.params.tiltSpeed;
+            const tiltAmount = Math.PI * this.fxHandler.params.tiltAmount;
+
+            // Simplex noise returns -1 to 1. Original used 2D noise with (n, constant).
+            this.vizHolder.rotation.x = this.noise2D(this.noiseTime, 0) * tiltAmount / 4;
+            this.vizHolder.rotation.y = this.noise2D(this.noiseTime, 100) * tiltAmount;
+            this.vizHolder.rotation.z = this.noise2D(this.noiseTime, 200) * tiltAmount;
+        }
+
         // Update Logic
         if (this.audioHandler) this.audioHandler.update();
+
         if (this.stars) this.stars.update();
         if (this.starBars) this.starBars.update();
         if (this.segments) this.segments.update();
         if (this.lightLeak) this.lightLeak.update();
         if (this.imagePlayer) this.imagePlayer.update();
         if (this.displacementTube) this.displacementTube.update();
+
         if (this.fxHandler) this.fxHandler.update();
 
         this.composer.render();
+    };
+
+    private onClick = (event: MouseEvent) => {
+        if (this.isPlaying) return;
+
+        // Calculate mouse position in normalized device coordinates
+        this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        const intersects = this.raycaster.intersectObject(this.imagePlayer.getMesh());
+
+        if (intersects.length > 0) {
+            if (this.audioHandler) {
+                this.audioHandler.resume();
+                this.audioHandler.play();
+                this.isPlaying = true;
+                this.container.style.cursor = 'default';
+            }
+        }
+    };
+
+    private onMouseMove = (event: MouseEvent) => {
+        if (this.isPlaying) return;
+
+        this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        const intersects = this.raycaster.intersectObject(this.imagePlayer.getMesh());
+
+        if (intersects.length > 0) {
+            this.container.style.cursor = 'pointer';
+        } else {
+            this.container.style.cursor = 'default';
+        }
     };
 
     public dispose() {
@@ -125,8 +188,11 @@ export class NeroApp {
             cancelAnimationFrame(this.animationId);
         }
         window.removeEventListener('resize', this.onResize);
-        window.removeEventListener('click', this.onBeat); // Actually this was an anonymous func, can't remove easily. That's fine for now or fix later.
         window.removeEventListener('onBeat', this.onBeat);
+        window.removeEventListener('click', this.onClick);
+        window.removeEventListener('mousemove', this.onMouseMove);
+
+        if (this.controlsHandler) this.controlsHandler.dispose();
 
         this.container.removeChild(this.renderer.domElement);
         this.renderer.dispose();

@@ -1,9 +1,12 @@
 import {
-    CatmullRomCurve3, Vector3, Color
+    CatmullRomCurve3, Vector3, Color, RingGeometry, MeshBasicMaterial, Mesh, DoubleSide
 } from 'three';
 import { ClipBoxes } from './effects/ClipBoxes';
 import { Rails } from './effects/Rails';
+import { Ribbon } from './effects/Ribbon';
 import { SpliceData } from './SpliceData';
+import { SpliceApp } from './SpliceApp';
+import { ImprovedNoise } from '../../viz/loop/ImprovedNoise';
 
 // Simple Math Utils replacement
 const randomRange = (min: number, max: number) => min + Math.random() * (max - min);
@@ -11,12 +14,20 @@ const randomRange = (min: number, max: number) => min + Math.random() * (max - m
 export class SpliceViz {
     private static instance: SpliceViz;
 
+    private app: SpliceApp;
+
     // Effects
     clipBoxes: ClipBoxes;
     rails: Rails;
+    ribbons: Ribbon[] = [];
 
-    constructor(scene: any, clipBoxes: ClipBoxes, rails: Rails) {
+    // Mover
+    mover!: Mesh;
+    private snoise = new ImprovedNoise();
+
+    constructor(app: SpliceApp, clipBoxes: ClipBoxes, rails: Rails) {
         SpliceViz.instance = this;
+        this.app = app;
         this.clipBoxes = clipBoxes;
         this.rails = rails;
     }
@@ -31,13 +42,28 @@ export class SpliceViz {
         // Init Effects
         this.rails.init();
 
+        // Init Mover
+        const geom = new RingGeometry(30, 50, 3, 2);
+        const mat = new MeshBasicMaterial({
+            color: 0xFFFFFF,
+            wireframe: true,
+            opacity: 0.2,
+            transparent: true,
+            side: DoubleSide
+        });
+
+        this.mover = new Mesh(geom, mat);
+        this.mover.frustumCulled = false;
+        this.mover.scale.multiplyScalar(0.2);
+        this.app.vizHolder.add(this.mover); // Add to vizHolder instead of creating separate seqHolder for now
+
         // Tracks & Clips
         const hues = [71, 342, 284, 185, 138];
         let clipCount = 0;
 
         trackData.forEach((track: any, i: number) => {
             const trackCol = new Color();
-            const r = Math.floor(Math.random() * hues.length);
+            const r = i % hues.length;
             trackCol.setHSL(hues[r] / 360, 1, 0.6);
 
             const dist = 30;
@@ -63,8 +89,11 @@ export class SpliceViz {
                         if (clipLen < 4) {
                             this.clipBoxes.addClip(clip.start, i);
                             clipCount++;
+                        } else {
+                            // Ribbon logic
+                            const ribbon = new Ribbon(this.app, clip.start, clip.end, trackCol.clone(), trackOffset);
+                            this.ribbons.push(ribbon);
                         }
-                        // Ribbon logic omitted for now
                     }
                 });
             }
@@ -93,5 +122,21 @@ export class SpliceViz {
         controlPoints[1].set(0, 0, ZSTEP * 2);
 
         SpliceData.splineCurve = new CatmullRomCurve3(controlPoints);
+        SpliceData.splineCurve = new CatmullRomCurve3(controlPoints);
+    }
+
+    update(songPos: number) {
+        if (!this.mover || !SpliceData.splineCurve) return;
+
+        // Move Mover
+        const point = SpliceData.splineCurve.getPoint(songPos);
+        if (point) {
+            this.mover.position.copy(point);
+            const lookAtPoint = SpliceData.splineCurve.getPoint(songPos + 0.01);
+            if (lookAtPoint) this.mover.lookAt(lookAtPoint);
+
+            this.mover.position.y -= 5;
+            this.mover.rotation.z = this.snoise.noise(songPos * 30, 100, 0) * Math.PI;
+        }
     }
 }

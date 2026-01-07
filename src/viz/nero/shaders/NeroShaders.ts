@@ -229,7 +229,7 @@ export const FilmShader = {
         nIntensity: { value: 0.5 },
         sIntensity: { value: 0.05 },
         sCount: { value: 4096 },
-        grayscale: { value: 1 }
+        grayscale: { value: 0 }  // 0 = false, 1 = true
     },
     vertexShader: `
         varying vec2 vUv;
@@ -240,7 +240,7 @@ export const FilmShader = {
     `,
     fragmentShader: `
         uniform float time;
-        uniform bool grayscale;
+        uniform float grayscale;
         uniform float nIntensity;
         uniform float sIntensity;
         uniform float sCount;
@@ -255,7 +255,7 @@ export const FilmShader = {
             vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );
             cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;
             cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );
-            if(grayscale) {
+            if(grayscale > 0.5) {
                 cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );
             }
             gl_FragColor =  vec4( cResult, cTextureScreen.a );

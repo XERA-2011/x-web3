@@ -23,7 +23,7 @@ export class StarBars {
     constructor(app: NeroApp) {
         this.app = app;
         this.container = new THREE.Object3D();
-        this.app.scene.add(this.container);
+        this.app.vizHolder.add(this.container);
 
         this.geometry = new THREE.PlaneGeometry(4, 100, 1, 1);
         this.material = new THREE.MeshBasicMaterial({

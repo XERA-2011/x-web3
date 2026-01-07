@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { WordProblemsApp } from '@/viz/word-problems/WordProblemsApp';
-import AudioFile from '@/viz/word-problems/res/mp3/Word_Problems_Edit.mp3';
+
+const AudioFile = '/viz/word-problems/audio/Word_Problems_Edit.mp3';
 
 export default function WordProblemsPage() {
     const containerRef = useRef<HTMLDivElement>(null);
