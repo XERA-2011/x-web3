@@ -23,13 +23,15 @@ export class SkyBox {
             map: texture,
             transparent: true,
             depthTest: true,
-            opacity: 1, // Original: 1 (Confirmed)
+            opacity: 1, // Original: 1
             fog: false,
             side: THREE.BackSide
+            // No color property - original uses default white
         });
 
         const geometry = new THREE.BoxGeometry(600, 600, 600); // Original: 600 (Confirmed)
         this.mesh = new THREE.Mesh(geometry, this.material);
+        this.mesh.renderOrder = -999; // Ensure background renders first
         // Original: backMesh.scale.x = -1;
         // Since we use BackSide, we might not need negative scale, 
         // but let's stick to original geometry logic if needed, or simply use BackSide.

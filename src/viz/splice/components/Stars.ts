@@ -17,8 +17,11 @@ export class Stars {
         this.container = new THREE.Object3D();
         this.app.vizHolder.add(this.container);
 
-        // Load Texture
+        // Load Texture with optimized filtering to prevent flickering
         const texture = new THREE.TextureLoader().load(StarTexture);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
 
         // Geometry
         const positions = new Float32Array(this.count * 3);
@@ -36,7 +39,7 @@ export class Stars {
 
         // Material
         this.material = new THREE.PointsMaterial({
-            size: 2, // Original: 2 (Confirmed in source Step 757)
+            size: 2, // Original: 2
             map: texture,
             blending: THREE.AdditiveBlending,
             depthTest: false, // Original: false (Confirmed)
@@ -53,6 +56,7 @@ export class Stars {
 
         this.points = new THREE.Points(this.geometry, this.material);
         this.points.frustumCulled = false;
+        this.points.renderOrder = -998; // Render after SkyBox
         this.container.add(this.points);
     }
 

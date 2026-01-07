@@ -8,6 +8,7 @@ import { Rails } from './effects/Rails';
 import { Tubes } from './effects/Tubes';
 import { Stars } from './components/Stars';
 import { SkyBox } from './components/SkyBox';
+import { LightLeak } from './effects/LightLeak';
 import { ImprovedNoise } from '../../viz/loop/ImprovedNoise';
 import { SpliceData } from './SpliceData';
 import gsap from 'gsap';
@@ -25,6 +26,7 @@ export class SpliceApp {
     tubes: Tubes;
     stars: Stars;
     skyBox: SkyBox;
+    lightLeak: LightLeak;
     spliceViz: SpliceViz;
     fxHandler: FXHandler;
 
@@ -50,16 +52,16 @@ export class SpliceApp {
     constructor(container: HTMLElement) {
         this.container = container;
 
-        // INIT 3D SCENE
+        // INIT 3D SCENE - Matching original SpliceMain.js exactly
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
         this.scene = new Scene();
         this.scene.add(this.camera);
-
-        this.scene.fog = new Fog(0x000000, 0, 1200);
+        this.scene.fog = new Fog(0x000000, 0, 1200); // Original: pure black
 
         this.renderer = new WebGLRenderer({});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0x000000);
+        this.renderer.setClearColor(0x000000); // Original: pure black
+        this.renderer.sortObjects = false; // Original: false - critical for transparency
         this.container.appendChild(this.renderer.domElement);
 
         this.vizHolder = new Object3D();
@@ -71,6 +73,7 @@ export class SpliceApp {
         this.tubes = new Tubes(this);
         this.stars = new Stars(this);
         this.skyBox = new SkyBox(this);
+        this.lightLeak = new LightLeak(this);
 
         // Init Logic
         this.spliceViz = new SpliceViz(this, this.clipBoxes, this.rails);
@@ -190,19 +193,27 @@ export class SpliceApp {
         this.stars.update();
         this.skyBox.update();
         this.tubes.update();
+        this.lightLeak.update(this.spliceViz.getMoverPos());
 
         this.fxHandler.update();
     }
 
+    private dataArray: Uint8Array | null = null;
+
     getSmoothedVolume(): number {
         if (!this.analyser) return 0;
-        const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-        this.analyser.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-            sum += dataArray[i];
+
+        if (!this.dataArray) {
+            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         }
-        return sum / dataArray.length / 256;
+
+        this.analyser.getByteFrequencyData(this.dataArray as any);
+        let sum = 0;
+        for (let i = 0; i < this.dataArray.length; i++) {
+            sum += this.dataArray[i];
+        }
+        // Basic smoothing 
+        return sum / this.dataArray.length / 256;
     }
 
     onResize() {

@@ -139,4 +139,8 @@ export class SpliceViz {
             this.mover.rotation.z = this.snoise.noise(songPos * 30, 100, 0) * Math.PI;
         }
     }
+
+    getMoverPos() {
+        return this.mover ? this.mover.position : new Vector3();
+    }
 }
