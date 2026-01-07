@@ -2,7 +2,7 @@
 import {
     Scene, Object3D, PointsMaterial, Points,
     Vector3, TextureLoader, AdditiveBlending, Color,
-    BufferGeometry, Float32BufferAttribute
+    BufferGeometry, Float32BufferAttribute, LinearFilter
 } from 'three';
 import { VizEffect, VizParams } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
@@ -53,6 +53,9 @@ export class Stars implements VizEffect {
         const loader = new TextureLoader();
         const imgSrc = (ParticleImg as any).src || ParticleImg;
         const texture = loader.load(imgSrc);
+        texture.minFilter = LinearFilter;
+        texture.magFilter = LinearFilter;
+        texture.generateMipmaps = false;
 
         this.material = new PointsMaterial({
             size: 100,

@@ -1,5 +1,5 @@
 
-import { DataTexture, RGBFormat } from 'three';
+import { DataTexture, RedFormat } from 'three';
 import { ATUtil } from './ATUtil';
 
 export interface AudioParams {
@@ -84,8 +84,8 @@ export class AudioAnalyzer {
             this.levelsData.push(0);
         }
 
-        this.levelsTextureData = new Uint8Array(this.levelsCount * 3);
-        this.levelsTexture = new DataTexture(this.levelsTextureData, this.levelsCount, 1, RGBFormat);
+        this.levelsTextureData = new Uint8Array(this.levelsCount);
+        this.levelsTexture = new DataTexture(this.levelsTextureData, this.levelsCount, 1, RedFormat);
 
         return true;
     }
@@ -115,9 +115,7 @@ export class AudioAnalyzer {
             this.levelsData[i] = val;
 
             if (this.levelsTextureData) {
-                this.levelsTextureData[3 * i] = Math.floor(255 * val);
-                this.levelsTextureData[3 * i + 1] = 0;
-                this.levelsTextureData[3 * i + 2] = 0;
+                this.levelsTextureData[i] = Math.floor(255 * val);
             }
 
             totalLevel += val;

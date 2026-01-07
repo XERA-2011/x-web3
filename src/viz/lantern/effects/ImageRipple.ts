@@ -1,7 +1,7 @@
 
 import {
     Scene, Object3D, PlaneGeometry, ShaderMaterial,
-    Mesh, AdditiveBlending, TextureLoader, DoubleSide
+    Mesh, AdditiveBlending, TextureLoader, DoubleSide, LinearFilter
 } from 'three';
 import { VizEffect, VizParams } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
@@ -48,7 +48,11 @@ export class ImageRipple implements VizEffect {
         for (let i = 0; i < this.textureCount; i++) {
             const img = TEXTURES[i];
             const src = (img as any).src || img;
-            this.textures.push(loader.load(src));
+            const texture = loader.load(src);
+            texture.minFilter = LinearFilter;
+            texture.magFilter = LinearFilter;
+            texture.generateMipmaps = false;
+            this.textures.push(texture);
         }
 
         this.material = new ShaderMaterial({

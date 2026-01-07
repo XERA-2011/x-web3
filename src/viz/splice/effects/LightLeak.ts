@@ -28,7 +28,7 @@ export class LightLeak {
             blending: THREE.AdditiveBlending,
             transparent: true,
             depthTest: false,
-            opacity: 0.08, // Original: 0.08 - very subtle
+            opacity: 0.08, // Original value - subtle glow
             fog: false,
         });
 

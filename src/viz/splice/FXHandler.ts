@@ -53,12 +53,10 @@ export class FXHandler {
 
         // Super Pass (Glow, Vignette, Brightness)
         this.superPass = new ShaderPass(SuperShader);
-        this.superPass.uniforms['vigDarkness'].value = 1;
-        this.superPass.uniforms['vigOffset'].value = 1.3;
-        this.superPass.uniforms['glowSize'].value = 2; // Original: 2 (Wait, Step 561 says 4.0 default, line 61 says 2 in usage) 
-        // Original code line 61: superPass.uniforms.glowSize.value = 2;
-        // So it IS 2.
-        this.superPass.uniforms['glowAmount'].value = 1;
+        this.superPass.uniforms['vigDarkness'].value = 1; // Original: 1
+        this.superPass.uniforms['vigOffset'].value = 1.3; // Original: 1.3
+        this.superPass.uniforms['glowSize'].value = 2; // Original: 2
+        this.superPass.uniforms['glowAmount'].value = 1; // Original: 1
         this.composer.addPass(this.superPass);
 
         this.resize();
