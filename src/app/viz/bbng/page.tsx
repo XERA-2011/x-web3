@@ -60,7 +60,7 @@ export default function BbngPage() {
             </div>
 
             <div className={`absolute bottom-5 left-5 text-gray-600 font-mono text-xs max-w-md pointer-events-none transition-opacity duration-500 ${started ? 'opacity-100' : 'opacity-0'}`}>
-                Can't Leave The Night - BADBADNOTGOOD
+                Can&apos;t Leave The Night - BADBADNOTGOOD
             </div>
         </div>
     );

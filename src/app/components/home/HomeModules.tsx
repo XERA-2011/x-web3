@@ -2,11 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import {
     Zap,
-    Bot,
-    BarChart3,
-    Puzzle,
-    ShieldCheck,
-    Globe,
     Eye,
     Infinity,
     Flame,
