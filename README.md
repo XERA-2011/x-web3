@@ -21,7 +21,7 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:2011](http://localhost:2011) with your browser to see the result.
 
 ## 📦 Build
 
