@@ -30,3 +30,9 @@ pnpm build
 ```
 
 Static output is generated in the `out/` directory.
+
+## 🛠️ Code Quality
+
+```bash
+pnpm lint
+```
