@@ -58,6 +58,7 @@ export class BbngApp {
     }
 
     async initAudio(url: string) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 1024;
@@ -96,6 +97,7 @@ export class BbngApp {
         this.renderTime += 0.01;
 
         // Audio update
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteFrequencyData(this.freqByteData as any);
         let sum = 0;
         for (let i = 0; i < this.freqByteData.length; i++) {

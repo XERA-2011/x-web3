@@ -32,6 +32,7 @@ export class SpliceViz {
         this.rails = rails;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSequenceLoaded(data: any) {
         console.log("SpliceViz: Sequence Loaded");
         SpliceData.trackDuration = data.duration;
@@ -61,6 +62,7 @@ export class SpliceViz {
         const hues = [71, 342, 284, 185, 138];
         let clipCount = 0;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         trackData.forEach((track: any, i: number) => {
             const trackCol = new Color();
             const r = i % hues.length;
@@ -78,9 +80,11 @@ export class SpliceViz {
 
             // Clips
             if (track.clips) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 track.clips.forEach((clip: any) => {
                     const clipLen = clip.end - clip.start;
                     if (clip.notes && clip.notes.length > 1) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         clip.notes.forEach((note: any) => {
                             this.clipBoxes.addClip(clip.start + note.from / 1000, i);
                             clipCount++;

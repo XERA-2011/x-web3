@@ -60,6 +60,7 @@ export class WhiteRing {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     update(dt: number, app: any) {
         this.groupHolder.rotation.z += 0.01;
 

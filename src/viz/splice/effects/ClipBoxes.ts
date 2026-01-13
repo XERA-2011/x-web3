@@ -7,6 +7,7 @@ import { SpliceData } from '../SpliceData';
 export class ClipBoxes {
     group: Object3D;
     private pool: ClipBox[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private clips: any[] = [];
     private clipCount = 0;
     private nextClipIndex = 0;

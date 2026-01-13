@@ -40,7 +40,8 @@ export class mBox {
         this.mesh.scale.set(s, s, s);
     }
 
-    update(vol: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update(_vol: number) {
         // Move z
         // Note: Original code used 'vol' or fixed speed? 
         // Original: this.boxes[i].update(this.sketchParams.cubeSpeed);

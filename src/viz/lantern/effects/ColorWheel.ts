@@ -2,7 +2,7 @@ import {
     Scene, Object3D, BufferGeometry, MeshBasicMaterial,
     Mesh, AdditiveBlending, Color, Float32BufferAttribute
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { createNoise2D } from 'simplex-noise';
 
@@ -25,7 +25,8 @@ export class ColorWheel implements VizEffect {
     private beatOffset = 0;
     private noise2D = createNoise2D();
 
-    init(scene: Scene, holder: Object3D, tumbler: Object3D) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    init(scene: Scene, holder: Object3D, _tumbler: Object3D) {
         // Original: VizHandler.getVizHolder().add(d) - uses holder, not tumbler
         this.holder = holder;
 
@@ -132,7 +133,8 @@ export class ColorWheel implements VizEffect {
         this.material.opacity = this.params.opacity;
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         // Original: if Math.random() < 0.5, rotation.z += random * PI * 2
         // Note: Original condition was "Math.random() < .5 || ..." which means 50% chance to skip
         if (this.mesh && Math.random() >= 0.5) {

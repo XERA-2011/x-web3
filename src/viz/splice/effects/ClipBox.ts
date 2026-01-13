@@ -1,6 +1,6 @@
 import {
     Object3D, MeshBasicMaterial, Mesh, AdditiveBlending, SpriteMaterial, Sprite,
-    TextureLoader, DoubleSide, BoxGeometry, TetrahedronGeometry, Texture
+    TextureLoader, BoxGeometry, TetrahedronGeometry, Texture
 } from 'three';
 import gsap from 'gsap';
 
@@ -24,6 +24,7 @@ export class ClipBox {
 
     constructor(parent: Object3D) {
         if (!glowTexture) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const imgSrc = (ParticleImg as any).src || ParticleImg;
             glowTexture = new TextureLoader().load(imgSrc);
         }
@@ -77,6 +78,7 @@ export class ClipBox {
         this.group.add(this.glow);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     set(clipData: any) {
         this.start = clipData.start;
         this.group.position.copy(clipData.position);

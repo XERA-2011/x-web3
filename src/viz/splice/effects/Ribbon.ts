@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { SpliceApp } from '../SpliceApp';
-import { SpliceViz } from '../SpliceViz';
+
 import { SpliceData } from '../SpliceData';
 
 export class Ribbon {

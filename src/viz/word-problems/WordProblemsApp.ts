@@ -69,6 +69,7 @@ export class WordProblemsApp {
     }
 
     async initAudio(url: string) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 1024;
@@ -127,7 +128,9 @@ export class WordProblemsApp {
     updateAudio() {
         if (!this.analyser) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteFrequencyData(this.freqByteData as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteTimeDomainData(this.timeByteData as any);
 
         // Calculate Levels

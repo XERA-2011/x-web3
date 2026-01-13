@@ -424,7 +424,7 @@ export const ImageRippleShader = {
   uniforms: {
     tMap: { value: null },
     audioDepth: { value: 400.0 },
-    levels: { value: [] }, // float array
+    levels: { value: new Array(100).fill(0) }, // float array
     numStrips: { value: 60.0 },
     opacity: { value: 1.0 },
   },

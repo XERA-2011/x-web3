@@ -1,5 +1,5 @@
 import {
-    Object3D, ShaderMaterial, PlaneGeometry, Mesh, AdditiveBlending, SphereGeometry
+    Object3D, ShaderMaterial, PlaneGeometry, Mesh, AdditiveBlending
 } from 'three';
 import { RipplesShader } from '../shaders/RipplesShader';
 import { ImprovedNoise } from '../../loop/ImprovedNoise'; // Reuse utils
@@ -65,6 +65,7 @@ export class Ripples {
         this.material.uniforms.noiseSize.value = this.params.noiseSize;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     update(dt: number, app: any) {
         if (!this.groupHolder.visible) return;
 

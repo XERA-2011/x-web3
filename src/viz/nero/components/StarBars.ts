@@ -44,7 +44,7 @@ export class StarBars {
             mesh.scale.x = ATUtil.randomRange(0.2, 2);
             mesh.scale.z = ATUtil.randomRange(0.2, 2);
 
-            (mesh as any).initPos = Math.random(); // Custom prop
+            mesh.userData = { initPos: Math.random() };
 
             this.container.add(mesh);
             mesh.rotation.x = Math.PI / 2;
@@ -90,7 +90,7 @@ export class StarBars {
 
         for (let i = 0; i < this.count; i++) {
             const mesh = this.meshes[i];
-            const initPos = (mesh as any).initPos;
+            const initPos = mesh.userData.initPos;
 
             // b = (a.initPos + n) % 1 * 2e3 - 1e3
             const z = ((initPos + this.n) % 1) * 2000 - 1000;

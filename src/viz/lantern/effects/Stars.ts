@@ -1,10 +1,10 @@
 
 import {
     Scene, Object3D, PointsMaterial, Points,
-    Vector3, TextureLoader, AdditiveBlending, Color,
+    TextureLoader, AdditiveBlending, Color,
     BufferGeometry, Float32BufferAttribute, LinearFilter
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { createNoise2D } from 'simplex-noise';
 import { ATUtil } from '../core/ATUtil';
@@ -51,6 +51,7 @@ export class Stars implements VizEffect {
 
         // Texture
         const loader = new TextureLoader();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const imgSrc = (ParticleImg as any).src || ParticleImg;
         const texture = loader.load(imgSrc);
         texture.minFilter = LinearFilter;
@@ -97,7 +98,8 @@ export class Stars implements VizEffect {
         this.geometry.attributes.position.needsUpdate = true;
     }
 
-    onBeat(audio: AudioAnalyzer) { }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) { }
     onBPMBeat() { }
 
     onToggle(active: boolean) {

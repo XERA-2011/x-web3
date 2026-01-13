@@ -41,6 +41,7 @@ export class AudioHandler {
     public hasWebAudio = true;
 
     constructor() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
         this.analyser = this.context.createAnalyser();
         this.analyser.smoothingTimeConstant = 0.3;
@@ -91,7 +92,9 @@ export class AudioHandler {
     update() {
         if (!this.isPlaying) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteFrequencyData(this.freqByteData as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteTimeDomainData(this.timeByteData as any);
 
         // Calculate levels (16 bins)

@@ -108,6 +108,7 @@ export class SpliceApp {
     }
 
     async loadAudio(audioUrl: string) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256;
@@ -207,6 +208,7 @@ export class SpliceApp {
             this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteFrequencyData(this.dataArray as any);
         let sum = 0;
         for (let i = 0; i < this.dataArray.length; i++) {

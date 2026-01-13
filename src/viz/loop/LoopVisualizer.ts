@@ -1,6 +1,6 @@
 import {
     Object3D, LineBasicMaterial, Line, Vector3,
-    BufferGeometry, Float32BufferAttribute, Color,
+    BufferGeometry, Float32BufferAttribute,
     AdditiveBlending, DynamicDrawUsage
 } from 'three';
 import { ImprovedNoise } from './ImprovedNoise';
@@ -57,6 +57,7 @@ export class LoopVisualizer {
 
         this.sharedGeometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
         // Mark as dynamic for frequent updates
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (this.sharedGeometry.attributes.position as any).usage = DynamicDrawUsage;
 
         let scale = 1;
@@ -86,6 +87,7 @@ export class LoopVisualizer {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     update(analyser: AnalyserNode, freqByteData: any, timeByteData: any) {
         if (!this.sharedGeometry) return;
 

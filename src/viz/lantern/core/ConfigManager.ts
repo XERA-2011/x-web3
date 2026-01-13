@@ -16,6 +16,7 @@ export interface AppConfig {
     displayHeight: number;
     BPM: number;
     mute?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 
@@ -27,6 +28,7 @@ export interface FXConfig {
             params: {
                 [key: string]: {
                     displayName: string;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     value: any;
                     min?: number;
                     max?: number;
@@ -75,7 +77,8 @@ export class ConfigManager {
         try {
             // In a real scenario we might have a map of configs
             // For now, we only have default
-            let data: any = DefaultConfig;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const data: any = DefaultConfig;
             if (configName !== 'default') {
                 console.warn(`Config ${configName} not found, using default`);
             }

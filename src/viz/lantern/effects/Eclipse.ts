@@ -1,9 +1,8 @@
-
 import {
     Scene, Object3D, PlaneGeometry, ShaderMaterial,
-    Mesh, AdditiveBlending, DoubleSide, DataTexture
+    Mesh, AdditiveBlending
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { createNoise2D } from 'simplex-noise';
 import { EclipseShader } from '../shaders/Shaders';
@@ -23,10 +22,11 @@ export class Eclipse implements VizEffect {
     private noise2D = createNoise2D();
     private noiseTime = 0;
 
-    init(scene: Scene, holder: Object3D, tumbler: Object3D) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    init(scene: Scene, holder: Object3D, _tumbler: Object3D) {
         this.holder = holder; // VizHandler.getVizHolder().add(r) -> holder, not tumbler
 
-        const uniforms = Object.assign({}, EclipseShader.uniforms);
+        // const uniforms = Object.assign({}, EclipseShader.uniforms);
         // Clone uniforms to avoid singleton conflict if needed, though Shader object redefines them.
         // Three.js ShaderMaterial takes uniforms object.
 
@@ -88,7 +88,8 @@ export class Eclipse implements VizEffect {
         this.updateUniforms();
     }
 
-    onBeat(audio: AudioAnalyzer) { }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) { }
     onBPMBeat() { }
 
     onToggle(active: boolean) {

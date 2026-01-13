@@ -16,6 +16,7 @@ import { Pass } from 'three/examples/jsm/postprocessing/Pass.js';
 import { DigitalGlitch } from './DigitalGlitch';
 
 export class GlitchPass extends Pass {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     uniforms: any;
     material: ShaderMaterial;
     camera: OrthographicCamera;
@@ -55,6 +56,7 @@ export class GlitchPass extends Pass {
         this.generateTrigger();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     render(renderer: any, writeBuffer: any, readBuffer: any, deltaTime: any, maskActive: any) {
         this.uniforms["tDiffuse"].value = readBuffer.texture;
         this.uniforms['seed'].value = Math.random(); // default seeding
