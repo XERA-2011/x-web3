@@ -3,7 +3,7 @@ import {
     Scene, Object3D, PlaneGeometry, ShaderMaterial,
     Mesh, AdditiveBlending, DoubleSide
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { RipplesShader } from '../shaders/Shaders';
 import { ATUtil } from '../core/ATUtil';
@@ -31,7 +31,8 @@ export class Ripples implements VizEffect {
     private noise2D = createNoise2D();
     private time = 0;
 
-    init(scene: Scene, holder: Object3D, tumbler: Object3D) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    init(_scene: Scene, holder: Object3D, _tumbler: Object3D) {
         this.holder = holder;
 
         // RipplesShader uniforms need initialization
@@ -114,7 +115,8 @@ export class Ripples implements VizEffect {
         this.material.uniforms.opacity.value = this.params.opacity;
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         if (this.material) {
             this.material.uniforms.noiseTime.value = 10 * Math.random();
 

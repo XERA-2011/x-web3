@@ -57,6 +57,7 @@ export class DisplacementTube {
         const loader = new THREE.TextureLoader();
         for (let i = 0; i < this.count; i++) {
             const img = TEXTURE_IMAGES[i];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const src = (img as any).src || img;
             this.textures[i] = loader.load(src);
         }
@@ -66,6 +67,7 @@ export class DisplacementTube {
         uniforms.texture.value = this.textures[0];
 
         // Initialize levels array for shader
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         uniforms.levels.value = new Array(16).fill(0) as any;
 
         this.material = new THREE.ShaderMaterial({

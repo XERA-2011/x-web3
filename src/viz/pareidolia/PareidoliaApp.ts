@@ -73,6 +73,7 @@ export class PareidoliaApp {
         this.scene.add(dirLight);
 
         // Init Audio
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 512;
@@ -88,9 +89,10 @@ export class PareidoliaApp {
     private initObjects() {
         // Shared Geometry & Material for Boxes
         const cubesize = 100;
-        const navBuffer = 5; // not sure what this was, but 100 is box size in original
+
         const geometry = new THREE.BoxGeometry(cubesize, cubesize, cubesize);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const imgTextureBoxes = new TextureLoader().load((StripesImg as any).src || StripesImg);
         const cubeMaterial = new THREE.MeshPhongMaterial({
             color: 0x666666,
@@ -109,12 +111,14 @@ export class PareidoliaApp {
         // Backgrounds
         const bgGeom = new THREE.PlaneGeometry(8000, 4000);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const imgTextureStars = new TextureLoader().load((StarsImg as any).src || StarsImg);
         const bgMatStars = new THREE.MeshBasicMaterial({ map: imgTextureStars, side: THREE.DoubleSide });
         this.bgStars = new THREE.Mesh(bgGeom, bgMatStars);
         this.bgStars.position.z = -2000;
         this.scene.add(this.bgStars);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const imgTextureStripes2 = new TextureLoader().load((Stripes2Img as any).src || Stripes2Img);
         const bgMatStripes = new THREE.MeshBasicMaterial({ map: imgTextureStripes2, side: THREE.DoubleSide, transparent: true, blending: THREE.AdditiveBlending });
         this.bgStripes = new THREE.Mesh(bgGeom, bgMatStripes);
@@ -124,6 +128,7 @@ export class PareidoliaApp {
 
         // Center Beams (Optional - replicating original main.js logic roughly)
         const beamGeom = new THREE.PlaneGeometry(100, 4000);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const imgTextureStripes = new TextureLoader().load((StripesImg as any).src || StripesImg);
         const beamMat = new THREE.MeshBasicMaterial({ map: imgTextureStripes, side: THREE.DoubleSide, transparent: true, blending: THREE.AdditiveBlending, opacity: 0.3 });
 
@@ -204,6 +209,7 @@ export class PareidoliaApp {
         this.animationId = requestAnimationFrame(this.animate);
 
         if (this.isAudioInitialized) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             this.analyser.getByteFrequencyData(this.dataArray as any);
         }
 

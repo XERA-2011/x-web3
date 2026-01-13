@@ -3,6 +3,7 @@ import { AudioAnalyzer } from './AudioAnalyzer';
 
 export interface VizParams {
     on: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 

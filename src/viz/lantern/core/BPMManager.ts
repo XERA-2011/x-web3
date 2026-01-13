@@ -3,7 +3,7 @@
 export class BPMManager {
     bpm: number = 120;
     beatDuration: number = 500; // ms
-    intervalId: any;
+    intervalId: NodeJS.Timeout | null = null;
     lastBeatTime: number = 0;
 
     // Tap tempo

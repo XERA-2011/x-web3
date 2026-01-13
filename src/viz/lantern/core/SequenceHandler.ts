@@ -13,7 +13,7 @@ const SEQUENCE_DATA = [
 ];
 
 const BAR_TIME = 2.926; // seconds per bar (from original)
-const DURATION = 120.6; // total track duration
+
 
 export class SequenceHandler {
     private controller: VizController;
@@ -147,6 +147,7 @@ export class SequenceHandler {
                 // ImageRipple freak and autoHide params
                 const imageRipple = ctrl.getEffect("ImageRipple");
                 if (imageRipple) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const params = imageRipple.getParams() as any;
                     params.freak = true;
                     params.autoHide = true;

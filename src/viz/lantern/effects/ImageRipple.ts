@@ -3,10 +3,10 @@ import {
     Scene, Object3D, PlaneGeometry, ShaderMaterial,
     Mesh, AdditiveBlending, TextureLoader, DoubleSide, LinearFilter
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { ImageRippleShader } from '../shaders/Shaders';
-import { gsap } from 'gsap';
+
 
 import Img0 from '../res/img/img-overlay/sbtrkt/0.jpg';
 import Img1 from '../res/img/img-overlay/sbtrkt/1.jpg';
@@ -34,6 +34,7 @@ export class ImageRipple implements VizEffect {
     private material: ShaderMaterial | null = null;
     private holder: Object3D | null = null;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private textures: any[] = [];
     private textureCount = 6;
     private currentTextureIndex = 0;
@@ -47,6 +48,7 @@ export class ImageRipple implements VizEffect {
         const loader = new TextureLoader();
         for (let i = 0; i < this.textureCount; i++) {
             const img = TEXTURES[i];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const src = (img as any).src || img;
             const texture = loader.load(src);
             texture.minFilter = LinearFilter;
@@ -81,7 +83,8 @@ export class ImageRipple implements VizEffect {
         this.onToggle(this.params.on);
     }
 
-    update(dt: number, audio: AudioAnalyzer, noiseTime: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update(dt: number, audio: AudioAnalyzer, _noiseTime: number) {
         if (!this.mesh || !this.material) return;
 
         this.material.uniforms.audioDepth.value = this.params.audioDepth;
@@ -102,7 +105,8 @@ export class ImageRipple implements VizEffect {
         }
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         if (this.params.step) {
             this.currentTextureIndex = (this.currentTextureIndex + 1) % this.textureCount;
             if (this.material) this.material.uniforms.tMap.value = this.textures[this.currentTextureIndex];

@@ -26,7 +26,8 @@ export class LightLeak implements VizEffect {
     private textureCount = 1;  // Original: c = 1
     private toggleState = true;  // Original: m = !0
 
-    init(scene: Scene, holder: Object3D, tumbler: Object3D) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    init(scene: Scene, _holder: Object3D, _tumbler: Object3D) {
         // Original: l = new THREE.Object3D, VizHandler.getScene().add(l)
         this.holder = new Object3D();
         scene.add(this.holder);
@@ -37,6 +38,7 @@ export class LightLeak implements VizEffect {
         //           u[t].minFilter = u[t].magFilter = THREE.LinearFilter
         for (let i = 0; i < this.textureCount; i++) {
             const img = TEXTURES[i];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const src = (img as any).src || img;
             const texture = loader.load(src);
             texture.minFilter = LinearFilter;
@@ -70,7 +72,8 @@ export class LightLeak implements VizEffect {
         this.onToggle(this.params.on);
     }
 
-    update(dt: number, audio: AudioAnalyzer, noiseTime: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update(_dt: number, _audio: AudioAnalyzer, _noiseTime: number) {
         if (!this.holder || !this.material) return;
 
         // Original: l.rotation.z += .005 - slightly reduced for smoother appearance
@@ -84,7 +87,8 @@ export class LightLeak implements VizEffect {
         }
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         // Original: Math.random() < .7 || (...) means 30% chance to execute
         if (this.mesh && this.material && Math.random() >= 0.7) {
             // Random rotation

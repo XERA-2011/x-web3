@@ -3,10 +3,10 @@ import {
     Scene, Object3D, PlaneGeometry, MeshBasicMaterial,
     Mesh, AdditiveBlending, TextureLoader, DoubleSide, LinearFilter
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { ATUtil } from '../core/ATUtil';
-import { BPMManager } from '../core/BPMManager';
+// import { BPMManager } from '../core/BPMManager';
 
 import Img0 from '../res/img/tunnel/0.jpg';
 import Img1 from '../res/img/tunnel/1.jpg';
@@ -28,6 +28,7 @@ export class ImageTunnel implements VizEffect {
     private tunnelGroup: Object3D | null = null;
     private rings: Mesh[] = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private textures: any[] = [];
     private textureCount = 3;
     private currentTextureIndex = 0;
@@ -37,7 +38,8 @@ export class ImageTunnel implements VizEffect {
     private ringCount = 24;
     private tunnelDepth = 2000;
 
-    init(scene: Scene, holder: Object3D, tumbler: Object3D) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    init(scene: Scene, holder: Object3D, _tumbler: Object3D) {
         this.holder = holder;
 
         this.tunnelGroup = new Object3D();
@@ -46,6 +48,7 @@ export class ImageTunnel implements VizEffect {
         const loader = new TextureLoader();
         for (let i = 0; i < this.textureCount; i++) {
             const img = TEXTURES[i];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const src = (img as any).src || img;
             const texture = loader.load(src);
             texture.minFilter = LinearFilter;
@@ -92,7 +95,8 @@ export class ImageTunnel implements VizEffect {
         }
     }
 
-    update(dt: number, audio: AudioAnalyzer, noiseTime: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update(_dt: number, _audio: AudioAnalyzer, _noiseTime: number) {
         if (!this.tunnelGroup) return;
 
         const time = performance.now();
@@ -107,7 +111,8 @@ export class ImageTunnel implements VizEffect {
         this.tunnelGroup.rotation.z += 0.002;
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         if (Math.random() < 0.2 && this.params.step) {
             this.currentTextureIndex = (this.currentTextureIndex + 1) % this.textureCount;
             if (this.material) this.material.map = this.textures[this.currentTextureIndex];

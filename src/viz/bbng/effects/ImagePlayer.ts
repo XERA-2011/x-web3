@@ -28,6 +28,7 @@ export class ImagePlayer {
         const loader = new THREE.TextureLoader();
         for (let i = 0; i < this.count; i++) {
             const img = IMAGES[i];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const src = (img as any).src || img;
             this.textures[i] = loader.load(src);
         }
@@ -58,6 +59,7 @@ export class ImagePlayer {
         this.mesh.visible = false;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     update(dt: number, app: any) {
         if (this.mesh.visible) {
             this.displayTime -= dt;

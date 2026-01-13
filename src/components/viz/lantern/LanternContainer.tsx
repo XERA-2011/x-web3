@@ -160,10 +160,7 @@ export default function LanternContainer() {
         }
     };
 
-    const handleLoadMp3 = (e: React.DragEvent) => {
-        e.preventDefault();
-        // Implement drag drop if possible, or just click
-    };
+
 
     useEffect(() => {
         // Prevent body scroll and overscroll rubber-banding
@@ -194,6 +191,7 @@ export default function LanternContainer() {
                     className="absolute inset-0 z-40 flex flex-col items-center justify-center text-center font-sans"
                 >
                     <h1 className="mb-2 opacity-0 intro-el">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="/viz/lantern/res/img/intro/logo-400.png" alt="ÜberViz" className="w-[400px] h-auto mx-auto" />
                     </h1>
                     <h2 className="text-[12px] tracking-[0.3em] font-normal text-[#999] mb-12 uppercase opacity-0 intro-el" style={{ textShadow: '0 1px 1px rgba(0,0,0,0.5)' }}>Realtime Music Visualizer</h2>
@@ -209,7 +207,7 @@ export default function LanternContainer() {
                         <div className="option clickable group cursor-pointer flex flex-col items-center" id="option-sample" onClick={handleSample}>
                             <h3 className="uppercase text-[10px] tracking-[0.2em] text-[#666] mb-5 group-hover:text-white transition-colors border-b border-transparent group-hover:border-white pb-1 underline-offset-4 font-bold">Play Sample Music</h3>
                             <div className="icon play w-[60px] h-[78px] bg-[url('/viz/lantern/res/img/intro/controller-play.svg')] bg-no-repeat bg-center opacity-70 group-hover:opacity-100 transition-all"></div>
-                            <p className="text-[9px] text-[#444] mt-2 font-mono leading-relaxed group-hover:text-[#666] transition-colors">"Lantern"<br />by Sbtrkt</p>
+                            <p className="text-[9px] text-[#444] mt-2 font-mono leading-relaxed group-hover:text-[#666] transition-colors">&quot;Lantern&quot;<br />by Sbtrkt</p>
                         </div>
 
                         <div
@@ -256,11 +254,11 @@ export default function LanternContainer() {
                             <p className="text-xs">By default Überviz automatically works with the incoming audio. Viz and FXs switch out based on beat detection.</p>
 
                             <h3 className="text-white uppercase tracking-wider text-xs border-b border-gray-600 pb-2 pt-4">Manual Mode</h3>
-                            <p className="text-xs">Hit 'Q' to toggle Control Panel. Uncheck 'AUTOMATIC' for manual control. Use 'AUDIO' 'Gain' to adjust for source volume.</p>
+                            <p className="text-xs">Hit &apos;Q&apos; to toggle Control Panel. Uncheck &apos;AUTOMATIC&apos; for manual control. Use &apos;AUDIO&apos; &apos;Gain&apos; to adjust for source volume.</p>
 
                             <h3 className="text-white uppercase tracking-wider text-xs border-b border-gray-600 pb-2 pt-4">Credits</h3>
                             <ul className="text-xs list-disc pl-4 space-y-1">
-                                <li>Sample Music is "Lantern" by Sbtrkt.</li>
+                                <li>Sample Music is &quot;Lantern&quot; by Sbtrkt.</li>
                                 <li>Built with Three.js, React, WebGL and Web Audio API.</li>
                                 <li>Recreated by Antigravity.</li>
                             </ul>

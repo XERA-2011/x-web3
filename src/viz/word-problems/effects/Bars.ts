@@ -1,5 +1,5 @@
 import {
-    Object3D, MeshBasicMaterial, PlaneGeometry, Mesh, Float32BufferAttribute, DynamicDrawUsage
+    Object3D, MeshBasicMaterial, PlaneGeometry, Mesh
 } from 'three';
 import { ImprovedNoise } from '../../loop/ImprovedNoise';
 // import { WordProblemsApp } from '../WordProblemsApp';
@@ -67,6 +67,7 @@ export class Bars {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     update(dt: number, app: any) { // app: WordProblemsApp (using any to avoid cycle)
         // slowly move up
         this.groupHolder.position.y = app.getBPMTime() * this.vertDistance; // simplified

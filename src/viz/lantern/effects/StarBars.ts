@@ -1,9 +1,9 @@
 
 import {
     Scene, Object3D, PlaneGeometry, MeshBasicMaterial,
-    Mesh, AdditiveBlending, DoubleSide, Color
+    Mesh, AdditiveBlending, DoubleSide
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { createNoise2D } from 'simplex-noise';
 import { ATUtil } from '../core/ATUtil';
@@ -71,7 +71,8 @@ export class StarBars implements VizEffect {
         this.onToggle(this.params.on);
     }
 
-    update(dt: number, audio: AudioAnalyzer, noiseTime: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update(dt: number, audio: AudioAnalyzer, _noiseTime: number) {
         if (!this.holder || !this.material) return;
 
         // f+=c.audioSpeed?c.speed/200*(AudioHandler.getVolume()+.2):c.speed/600
@@ -101,7 +102,8 @@ export class StarBars implements VizEffect {
         }
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         if (this.holder && Math.random() < 0.5) {
             this.holder.rotation.z += Math.random() * Math.PI * 2;
         }

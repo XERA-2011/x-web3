@@ -5,7 +5,7 @@ export const SuperShader = {
         tDiffuse: { value: null },
         glowAmount: { value: 0.5 },
         glowSize: { value: 4 },
-        resolution: { value: null }, // needs Vector2
+        resolution: { value: new THREE.Vector2() }, // needs Vector2
         vigOffset: { value: 1 },
         vigDarkness: { value: 1 },
         hue: { value: 0 },
@@ -87,7 +87,7 @@ export const DisplacementMatShader = {
         stretch: { value: 10 },
         depth: { value: 300 },
         audioDepth: { value: 1 },
-        levels: { value: [] }, // Array of floats
+        levels: { value: new Array(16).fill(0) }, // Array of floats
         numStrips: { value: 20 }
     },
     vertexShader: `

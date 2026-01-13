@@ -215,7 +215,8 @@ export class ControlsHandler {
                 const value = params[key];
                 if (typeof value === 'number') {
                     // Determine reasonable range
-                    let min = 0, max = 1, step = 0.01;
+                    const min = 0;
+                    let max = 1, step = 0.01;
                     if (key.includes('scale') || key.includes('size')) {
                         max = 10;
                         step = 0.1;

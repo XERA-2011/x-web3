@@ -25,7 +25,7 @@ export class Stars {
 
         // Geometry
         const positions = new Float32Array(this.count * 3);
-        const origZ = new Float32Array(this.count);
+
 
         for (let i = 0; i < this.count; i++) {
             positions[i * 3] = (Math.random() - 0.5) * 2 * this.spread;
@@ -67,7 +67,7 @@ export class Stars {
         const camZ = this.app.camera.position.z;
 
         for (let i = 0; i < this.count; i++) {
-            let zIndex = i * 3 + 2;
+            const zIndex = i * 3 + 2;
             positions[zIndex] -= 1; // Move closer
 
             if (positions[zIndex] < camZ) {

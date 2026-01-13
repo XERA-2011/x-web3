@@ -1,7 +1,6 @@
-
 import {
-    Scene, Camera, WebGLRenderer, Vector2,
-    ShaderMaterial, UniformsUtils, Color
+    Scene, Camera, WebGLRenderer,
+    // ShaderMaterial, UniformsUtils, Color
 } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -35,6 +34,7 @@ export interface FXParams {
 
 export class FXManager {
     composer: EffectComposer | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passes: any = {};
 
     // FX Params

@@ -2,7 +2,7 @@ import {
     Scene, Object3D, TetrahedronGeometry, MeshBasicMaterial,
     Mesh, AdditiveBlending, DoubleSide
 } from 'three';
-import { VizEffect, VizParams } from '../core/VizEffect';
+import { VizEffect } from '../core/VizEffect';
 import { AudioAnalyzer } from '../core/AudioAnalyzer';
 import { ATUtil } from '../core/ATUtil';
 import { createNoise2D } from 'simplex-noise';
@@ -46,6 +46,7 @@ export class Crystal implements VizEffect {
                 depthTest: false
             });
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const mesh = new Mesh(geometry, mat) as any;
             mesh.scale.x = 2; // Original: v.scale.x = 2
 
@@ -98,6 +99,7 @@ export class Crystal implements VizEffect {
             const t = (performance.now() * 0.001) % 1;
             const n = Math.sin(t * Math.PI);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             this.meshes.forEach((mesh: any) => {
                 mesh.material.color.setHex(Math.random() * 0xffffff);
                 mesh.position.x = n * mesh.maxPosn.x;
@@ -105,6 +107,7 @@ export class Crystal implements VizEffect {
                 mesh.position.z = n * mesh.maxPosn.z;
             });
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             this.meshes.forEach((mesh: any) => {
                 mesh.position.x = mesh.restPosn.x;
                 mesh.position.y = mesh.restPosn.y;
@@ -113,11 +116,13 @@ export class Crystal implements VizEffect {
         }
     }
 
-    onBeat(audio: AudioAnalyzer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onBeat(_audio: AudioAnalyzer) {
         // Original: randomly rotate and scale one mesh
         if (this.meshes.length === 0) return;
 
         const idx = ATUtil.randomInt(0, this.meshes.length - 1);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mesh = this.meshes[idx] as any;
 
         // Random rotation

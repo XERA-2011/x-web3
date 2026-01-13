@@ -52,8 +52,8 @@ export class AudioAnalyzer {
 
     init(): boolean {
         try {
-            // @ts-ignore
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
             this.context = new AudioContextClass();
         } catch (e) {
             console.error("Web Audio API not supported", e);
@@ -97,7 +97,9 @@ export class AudioAnalyzer {
         if (!this.source) return;
 
         // TypeScript strictness override
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteFrequencyData(this.freqByteData as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.analyser.getByteTimeDomainData(this.timeByteData as any);
 
         let totalLevel = 0;
